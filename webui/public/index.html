@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G4F Web UI</title>
+<style>
+body{
+  background-color:#f7f9fc;
+  font-family:'Segoe UI',Tahoma,sans-serif;
+  max-width:800px;
+  margin:0 auto;
+  padding:2rem;
+  color:#333;
+}
+h1{
+  font-size:1.8rem;
+  margin-bottom:1rem;
+  color:#2c3e50;
+}
+textarea{
+  width:100%;
+  height:100px;
+  padding:0.5rem;
+  font-size:1rem;
+  border:1px solid #ccc;
+  border-radius:6px;
+  box-sizing:border-box;
+  resize:vertical;
+}
+button{
+  margin-top:0.5rem;
+  padding:0.5rem 1rem;
+  font-size:1rem;
+  border:none;
+  border-radius:6px;
+  background-color:#0d6efd;
+  color:#fff;
+  cursor:pointer;
+  transition:background-color 0.2s ease;
+}
+button:hover{
+  background-color:#0b5ed7;
+}
+.history{
+  margin-top:1rem;
+  font-family:'Courier New',monospace;
+  border:1px solid #ddd;
+  border-radius:6px;
+  padding:1rem;
+  background-color:#fff;
+  max-height:400px;
+  overflow-y:auto;
+  box-shadow:0 1px 3px rgba(0,0,0,0.08);
+}
+.user-line{
+  margin-bottom:0.25rem;
+  color:#2c7a7b;
+}
+.ai-line{
+  margin-bottom:0.5rem;
+  color:#1a73e8;
+  white-space:pre-wrap;
+}
+.chat-bubble{
+  background-color:#ffffff;
+  border:1px solid #e0e0e0;
+  border-radius:12px;
+  padding:0.5rem;
+  margin-bottom:0.5rem;
+  max-width:80%;
+  box-shadow:0 1px 2px rgba(0,0,0,0.05);
+  white-space:pre-wrap;
+}
+.chat-user{
+  align-self:flex-end;
+  background-color:#e8f5e9;
+  border-color:#c8e6c9;
+}
+.controls{
+  margin-top:1rem;
+  display:flex;
+  align-items:center;
+  font-size:0.9rem;
+  color:#555;
+}
+.controls label{
+  margin-right:1rem;
+}
+.interpreter-output{
+  color:#6d4c41;
+  margin-bottom:0.5rem;
+  white-space:pre-wrap;
+  font-family:'Courier New',monospace;
+}
+
+/* Terminal preview styles */
+.terminal-preview {
+  margin-top:1rem;
+  background-color:#111;
+  color:#e0e0e0;
+  font-family:'Courier New',monospace;
+  padding:1rem;
+  border-radius:6px;
+  height:200px;
+  overflow-y:auto;
+  white-space:pre-wrap;
+  box-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Styling for model selection drop‑down */
+select.model-select {
+  margin-left:1rem;
+  padding:0.3rem;
+  font-size:0.9rem;
+  border:1px solid #ccc;
+  border-radius:4px;
+}
+</style>
+<script type="module">
+import Client from 'https://g4f.dev/dist/js/client.js';
+// Create a single instance of the g4f client that can be reused across modes.
+const client = new Client();
+// Track the current UI mode: cli, chat or interpreter.
+let mode = 'cli';
+// Track the working directory for interpreter mode. The server keeps its own
+// working directory state, but we mirror it client‑side for display.
+let cwd = '~';
+// List of available AI models. Include 'auto' for automatic selection.
+const models = ['auto', 'gpt-4.1', 'gpt-3.5-turbo', 'gpt-4', 'claude-3-opus'];
+// Current model selected by the user. Defaults to 'auto'. When set to 'auto'
+// the first real model will be used when making a request.
+let currentModel = 'auto';
+
+// Reference to the terminal preview element. This will be used to
+// display a real‑time, CLI‑style view of the interaction. It is
+// created after DOMContentLoaded fires.
+let previewEl;
+// Maintain counts of AI requests and shell commands to mimic CLI stats.
+// Also store the history of user commands to allow /history retrieval.
+let aiCount = 0;
+let shellCount = 0;
+const commandHistory = [];
+
+/**
+ * Switch the application mode and clear the history display. When a mode is
+ * changed the previous interactions are cleared to avoid mixing contexts.
+ * @param {string} value The mode to switch to ('cli', 'chat', 'interpreter').
+ */
+function setMode(value) {
+  mode = value;
+  const hist = document.getElementById('history');
+  hist.innerHTML = '';
+}
+
+/**
+ * Handle slash commands entered by the user. Slash commands are inspired by
+ * the CLI and allow users to perform actions such as clearing history or
+ * switching modes directly from the input field. Returns true if a command
+ * was handled.
+ * @param {string} message The raw user input beginning with '/'.
+ * @param {HTMLElement} historyEl The history container.
+ * @returns {boolean} True if a slash command was processed.
+ */
+function handleSlashCommand(message, historyEl) {
+  const parts = message.slice(1).trim().split(/\s+/);
+  const cmd = parts[0].toLowerCase();
+  const args = parts.slice(1).join(' ');
+  if (cmd === 'help') {
+    const helpLines = [];
+    helpLines.push('Comandos disponibles:');
+    helpLines.push('  /help          Muestra esta ayuda.');
+    helpLines.push('  /clear         Limpia el historial de mensajes.');
+    helpLines.push('  /mode [tipo]   Cambia de modo (cli, chat o interpreter).');
+    helpLines.push('  /quit          Finaliza la sesión (solo limpia la pantalla).');
+    helpLines.push('  /cwd           Muestra el directorio de trabajo actual (intérprete).');
+    helpLines.push('  /shell <cmd>   Ejecuta un comando en modo intérprete desde cualquier modo.');
+    helpLines.push('  /stats         Muestra estadísticas de uso (AI y comandos).');
+    helpLines.push('  /history       Lista los comandos introducidos en esta sesión.');
+    helpLines.push('  /models        Lista los modelos de IA disponibles.');
+    helpLines.push('  /model <m>     Cambia el modelo de IA.');
+    helpLines.push('  /auto          Selecciona automáticamente el modelo por defecto.');
+    helpLines.push('  /time          Muestra fecha y hora actual.');
+    helpLines.push('  /date          Muestra solo la fecha actual.');
+    helpLines.push('  /echo <txt>    Repite el texto introducido.');
+    helpLines.push('  /count <txt>   Indica la longitud del texto.');
+    helpLines.push('  /reset         Reinicia estadísticas e historial.');
+    const helpDiv = document.createElement('div');
+    helpDiv.className = 'ai-line';
+    helpDiv.textContent = helpLines.join('\n');
+    historyEl.appendChild(helpDiv);
+    appendToPreview(helpLines.join('\n'));
+    historyEl.scrollTop = historyEl.scrollHeight;
+    return true;
+  }
+  if (cmd === 'stats') {
+    const statsMsg = `Número de solicitudes AI: ${aiCount}\nNúmero de comandos de intérprete: ${shellCount}`;
+    const statsDiv = document.createElement('div');
+    statsDiv.className = 'ai-line';
+    statsDiv.textContent = statsMsg;
+    historyEl.appendChild(statsDiv);
+    historyEl.scrollTop = historyEl.scrollHeight;
+    appendToPreview(statsMsg);
+    return true;
+  }
+  if (cmd === 'history') {
+    if (commandHistory.length === 0) {
+      const noHist = document.createElement('div');
+      noHist.className = 'ai-line';
+      noHist.textContent = 'No hay historial disponible.';
+      historyEl.appendChild(noHist);
+      historyEl.scrollTop = historyEl.scrollHeight;
+      appendToPreview('No hay historial disponible.');
+    } else {
+      const list = commandHistory.map((c, idx) => `${idx + 1}: ${c}`).join('\n');
+      const histDiv = document.createElement('div');
+      histDiv.className = 'ai-line';
+      histDiv.textContent = list;
+      historyEl.appendChild(histDiv);
+      historyEl.scrollTop = historyEl.scrollHeight;
+      appendToPreview(list);
+    }
+    return true;
+  }
+  if (cmd === 'models') {
+    // List available models
+    const list = models.map((m) => `  ${m}`).join('\n');
+    const msg = `Modelos disponibles:\n${list}\nModelo actual: ${currentModel}`;
+    const div = document.createElement('div');
+    div.className = 'ai-line';
+    div.textContent = msg;
+    historyEl.appendChild(div);
+    historyEl.scrollTop = historyEl.scrollHeight;
+    appendToPreview(msg);
+    return true;
+  }
+  if (cmd === 'model') {
+    if (!args) {
+      const msg = `Uso: /model <nombre>. Modelo actual: ${currentModel}`;
+      const div = document.createElement('div');
+      div.className = 'ai-line';
+      div.textContent = msg;
+      historyEl.appendChild(div);
+      historyEl.scrollTop = historyEl.scrollHeight;
+      appendToPreview(msg);
+      return true;
+    }
+    const candidate = args.trim();
+    if (models.includes(candidate)) {
+      currentModel = candidate;
+      const msg = `Modelo actualizado a ${currentModel}`;
+      const div = document.createElement('div');
+      div.className = 'ai-line';
+      div.textContent = msg;
+      historyEl.appendChild(div);
+      historyEl.scrollTop = historyEl.scrollHeight;
+      appendToPreview(msg);
+    } else {
+      const msg = 'Modelo no reconocido. Usa /models para listar.';
+      const div = document.createElement('div');
+      div.className = 'ai-line';
+      div.textContent = msg;
+      historyEl.appendChild(div);
+      historyEl.scrollTop = historyEl.scrollHeight;
+      appendToPreview(msg);
+    }
+    return true;
+  }
+  if (cmd === 'time') {
+    const now = new Date();
+    const msg = `Hora actual: ${now.toLocaleString()}`;
+    const div = document.createElement('div');
+    div.className = 'ai-line';
+    div.textContent = msg;
+    historyEl.appendChild(div);
+    historyEl.scrollTop = historyEl.scrollHeight;
+    appendToPreview(msg);
+    return true;
+  }
+  if (cmd === 'reset') {
+    historyEl.innerHTML = '';
+    if (previewEl) previewEl.textContent = '';
+    aiCount = 0;
+    shellCount = 0;
+    commandHistory.length = 0;
+    const msg = 'Se han restablecido estadísticas e historial.';
+    const div = document.createElement('div');
+    div.className = 'ai-line';
+    div.textContent = msg;
+    historyEl.appendChild(div);
+    historyEl.scrollTop = historyEl.scrollHeight;
+    appendToPreview(msg);
+    return true;
+  }
+  if (cmd === 'auto') {
+    currentModel = 'auto';
+    const msg = 'Modelo establecido en modo automático.';
+    const div = document.createElement('div');
+    div.className = 'ai-line';
+    div.textContent = msg;
+    historyEl.appendChild(div);
+    historyEl.scrollTop = historyEl.scrollHeight;
+    appendToPreview(msg);
+    // Update select element if present
+    const sel = document.getElementById('model-select');
+    if (sel) sel.value = 'auto';
+    return true;
+  }
+  if (cmd === 'echo') {
+    if (!args) {
+      const msg = 'Uso: /echo <texto>';
+      const div = document.createElement('div');
+      div.className = 'ai-line';
+      div.textContent = msg;
+      historyEl.appendChild(div);
+      historyEl.scrollTop = historyEl.scrollHeight;
+      appendToPreview(msg);
+    } else {
+      const div = document.createElement('div');
+      div.className = 'ai-line';
+      div.textContent = args;
+      historyEl.appendChild(div);
+      historyEl.scrollTop = historyEl.scrollHeight;
+      appendToPreview(args);
+    }
+    return true;
+  }
+  if (cmd === 'count') {
+    if (!args) {
+      const msg = 'Uso: /count <texto>';
+      const div = document.createElement('div');
+      div.className = 'ai-line';
+      div.textContent = msg;
+      historyEl.appendChild(div);
+      historyEl.scrollTop = historyEl.scrollHeight;
+      appendToPreview(msg);
+    } else {
+      const len = args.length;
+      const msg = `Longitud: ${len}`;
+      const div = document.createElement('div');
+      div.className = 'ai-line';
+      div.textContent = msg;
+      historyEl.appendChild(div);
+      historyEl.scrollTop = historyEl.scrollHeight;
+      appendToPreview(msg);
+    }
+    return true;
+  }
+  if (cmd === 'date') {
+    const now = new Date();
+    const msg = `Fecha actual: ${now.toLocaleDateString()}`;
+    const div = document.createElement('div');
+    div.className = 'ai-line';
+    div.textContent = msg;
+    historyEl.appendChild(div);
+    historyEl.scrollTop = historyEl.scrollHeight;
+    appendToPreview(msg);
+    return true;
+  }
+  if (cmd === 'clear') {
+    historyEl.innerHTML = '';
+    if (previewEl) previewEl.textContent = '';
+    return true;
+  }
+  if (cmd === 'mode') {
+    if (['cli','chat','interpreter'].includes(args)) {
+      setMode(args);
+      const info = document.createElement('div');
+      info.className = 'ai-line';
+      info.textContent = `Modo cambiado a ${args}`;
+      historyEl.appendChild(info);
+      historyEl.scrollTop = historyEl.scrollHeight;
+      appendToPreview(`Modo cambiado a ${args}`);
+    } else {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'ai-line';
+      errorDiv.textContent = 'Modo no reconocido. Usa cli, chat o interpreter.';
+      historyEl.appendChild(errorDiv);
+      historyEl.scrollTop = historyEl.scrollHeight;
+      appendToPreview('Modo no reconocido. Usa cli, chat o interpreter.');
+    }
+    return true;
+  }
+  if (cmd === 'quit') {
+    historyEl.innerHTML = '';
+    const bye = document.createElement('div');
+    bye.className = 'ai-line';
+    bye.textContent = 'Sesión terminada.';
+    historyEl.appendChild(bye);
+    appendToPreview('Sesión terminada.');
+    return true;
+  }
+  if (cmd === 'cwd') {
+    const cwdDiv = document.createElement('div');
+    cwdDiv.className = 'ai-line';
+    cwdDiv.textContent = `Directorio actual: ${cwd}`;
+    historyEl.appendChild(cwdDiv);
+    historyEl.scrollTop = historyEl.scrollHeight;
+    appendToPreview(`Directorio actual: ${cwd}`);
+    return true;
+  }
+  if (cmd === 'shell') {
+    // Allow executing a shell command directly from any mode. Delegate to
+    // interpreter handler.
+    const shellCommand = args;
+    if (!shellCommand) {
+      const err = document.createElement('div');
+      err.className = 'ai-line';
+      err.textContent = 'Uso: /shell <comando>';
+      historyEl.appendChild(err);
+      historyEl.scrollTop = historyEl.scrollHeight;
+      appendToPreview('Uso: /shell <comando>');
+      return true;
+    }
+    executeInterpreter(shellCommand, historyEl);
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Send a request to the interpreter API and append the output to the history.
+ * This function maintains the client‑side working directory when the command
+ * includes a directory change (cd). It streams the output once received.
+ * @param {string} command The shell command to execute.
+ * @param {HTMLElement} historyEl The history container.
+ */
+async function executeInterpreter(command, historyEl) {
+  const cmdLine = document.createElement('div');
+  cmdLine.className = 'user-line';
+  cmdLine.textContent = `$ ${command}`;
+  historyEl.appendChild(cmdLine);
+  appendToPreview(`$ ${command}`);
+  const outLine = document.createElement('div');
+  outLine.className = 'interpreter-output';
+  outLine.textContent = '';
+  historyEl.appendChild(outLine);
+  historyEl.scrollTop = historyEl.scrollHeight;
+  try {
+    const res = await fetch('/api/interpreter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ command }),
+    });
+    const data = await res.json();
+    if (data.error) {
+      outLine.textContent = `[Error] ${data.error}`;
+      appendToPreview(`[Error] ${data.error}`);
+    } else {
+      const full = data.output || '';
+      let i = 0;
+      const interval = setInterval(() => {
+        outLine.textContent = full.slice(0, i);
+        historyEl.scrollTop = historyEl.scrollHeight;
+        i++;
+        if (i > full.length) {
+          clearInterval(interval);
+          // Once streaming completes, append full output to preview
+          appendToPreview(full);
+        }
+      }, 15);
+      // Update cwd if returned
+      if (data.cwd) {
+        cwd = data.cwd;
+      }
+    }
+  } catch (err) {
+    outLine.textContent = '[Error] ' + err.message;
+    appendToPreview('[Error] ' + err.message);
+  }
+  historyEl.scrollTop = historyEl.scrollHeight;
+}
+
+/**
+ * Process a user message according to the current mode. Handles slash
+ * commands and delegates to the appropriate generator (g4f or shell).
+ */
+async function sendMessage() {
+  const inputEl = document.getElementById('input');
+  const historyEl = document.getElementById('history');
+  const message = inputEl.value.trim();
+  if (!message) return;
+  inputEl.value = '';
+  // Check for slash commands regardless of mode.
+  if (message.startsWith('/')) {
+    if (handleSlashCommand(message, historyEl)) return;
+    // If not handled fall through to g4f.
+  }
+  if (mode === 'cli') {
+    // CLI mode: show prompts prefixed with ">" and stream AI response.
+    const userLine = document.createElement('div');
+    userLine.className = 'user-line';
+    userLine.textContent = `> ${message}`;
+    historyEl.appendChild(userLine);
+    appendToPreview(`> ${message}`);
+    const aiLine = document.createElement('div');
+    aiLine.className = 'ai-line';
+    aiLine.textContent = '';
+    historyEl.appendChild(aiLine);
+    historyEl.scrollTop = historyEl.scrollHeight;
+    try {
+      // Determine which model to use. When in automatic mode use the first real model.
+      const modelToUse = currentModel === 'auto' ? (models[1] || 'gpt-4.1') : currentModel;
+      const result = await client.chat.completions.create({
+        model: modelToUse,
+        messages: [{ role: 'user', content: message }],
+      });
+      let fullText = (result?.choices?.[0]?.message?.content) || '';
+      if (!fullText) {
+        // Fallback when the model does not respond
+        fullText = `[Stub] Respuesta simulada a: ${message}`;
+      }
+      let index = 0;
+      const interval = setInterval(() => {
+        aiLine.textContent = fullText.slice(0, index);
+        historyEl.scrollTop = historyEl.scrollHeight;
+        index++;
+        if (index > fullText.length) {
+          clearInterval(interval);
+          // Append full response once finished streaming
+          appendToPreview(fullText);
+        }
+      }, 30);
+    } catch (err) {
+      aiLine.textContent = '[Error] ' + err.message;
+      appendToPreview('[Error] ' + err.message);
+    }
+    // Record AI usage and history
+    aiCount++;
+    commandHistory.push(message);
+    return;
+  }
+  if (mode === 'chat') {
+    // Chat mode: show messages as chat bubbles.
+    const userDiv = document.createElement('div');
+    userDiv.className = 'chat-bubble chat-user';
+    userDiv.textContent = message;
+    historyEl.appendChild(userDiv);
+    appendToPreview(`> ${message}`);
+    const aiDiv = document.createElement('div');
+    aiDiv.className = 'chat-bubble';
+    aiDiv.textContent = '';
+    historyEl.appendChild(aiDiv);
+    historyEl.scrollTop = historyEl.scrollHeight;
+    try {
+      const modelToUse = currentModel === 'auto' ? (models[1] || 'gpt-4.1') : currentModel;
+      const result = await client.chat.completions.create({
+        model: modelToUse,
+        messages: [{ role: 'user', content: message }],
+      });
+      let fullText = (result?.choices?.[0]?.message?.content) || '';
+      if (!fullText) {
+        fullText = `[Stub] Respuesta simulada a: ${message}`;
+      }
+      let index = 0;
+      const interval = setInterval(() => {
+        aiDiv.textContent = fullText.slice(0, index);
+        historyEl.scrollTop = historyEl.scrollHeight;
+        index++;
+        if (index > fullText.length) {
+          clearInterval(interval);
+          appendToPreview(fullText);
+        }
+      }, 30);
+    } catch (err) {
+      aiDiv.textContent = '[Error] ' + err.message;
+      appendToPreview('[Error] ' + err.message);
+    }
+    // Record AI usage and history
+    aiCount++;
+    commandHistory.push(message);
+    return;
+  }
+  if (mode === 'interpreter') {
+    // Interpreter mode: run a shell command on the server.
+    executeInterpreter(message, historyEl);
+    // Record shell usage and history
+    shellCount++;
+    commandHistory.push(message);
+    return;
+  }
+}
+
+// Register event listeners once the DOM is ready.
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('send').addEventListener('click', sendMessage);
+  document.getElementById('mode-cli').addEventListener('change', () => setMode('cli'));
+  document.getElementById('mode-chat').addEventListener('change', () => setMode('chat'));
+  document.getElementById('mode-interpreter').addEventListener('change', () => setMode('interpreter'));
+  // Initialise the preview element
+  previewEl = document.getElementById('terminal-preview');
+  if (previewEl) {
+    previewEl.textContent = '';
+  }
+
+  // Set up model select. Keep the drop‑down in sync with the current model
+  const sel = document.getElementById('model-select');
+  if (sel) {
+    sel.value = currentModel;
+    sel.addEventListener('change', () => {
+      const selected = sel.value;
+      if (models.includes(selected)) {
+        currentModel = selected;
+      }
+    });
+  }
+});
+
+/**
+ * Append a line of text to the terminal preview. If the preview
+ * element has not been initialised, this is a no‑op. Text is
+ * appended with a newline and the preview scrolls to the bottom.
+ * @param {string} text The text to append
+ */
+function appendToPreview(text) {
+  if (!previewEl) return;
+  previewEl.textContent += (previewEl.textContent ? '\n' : '') + text;
+  previewEl.scrollTop = previewEl.scrollHeight;
+}
+</script>
+</head>
+<body>
+<h1>Interfaz Web para g4f</h1>
+<p>Introduce un mensaje y pulsa «Enviar» para recibir una respuesta.</p>
+<textarea id="input" placeholder="Escribe tu mensaje aquí..."></textarea>
+<button id="send">Enviar</button>
+<div id="response" class="response"></div>
+<div class="controls">
+  <label><input type="radio" name="mode" id="mode-cli" value="cli" checked>C&nbsp;Vista CLI</label>
+  <label style="margin-left:1rem;"><input type="radio" name="mode" id="mode-chat" value="chat">&nbsp;Chat en Web</label>
+  <label style="margin-left:1rem;"><input type="radio" name="mode" id="mode-interpreter" value="interpreter">&nbsp;Intérprete</label>
+  <label style="margin-left:1rem;">Modelo:
+    <select id="model-select" class="model-select">
+      <option value="auto">auto</option>
+      <option value="gpt-4.1">gpt-4.1</option>
+      <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+      <option value="gpt-4">gpt-4</option>
+      <option value="claude-3-opus">claude-3-opus</option>
+    </select>
+  </label>
+</div>
+<div id="history" class="history"></div>
+<!-- Real‑time terminal preview for CLI and intérprete -->
+<div id="terminal-preview" class="terminal-preview"></div>
+</body>
+</html>

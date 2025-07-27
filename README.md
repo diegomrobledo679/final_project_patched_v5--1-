@@ -1,0 +1,104 @@
+# Proyecto Unificado g4f
+
+Este proyecto proporciona una versión unificada de tres mecanismos
+originalmente separados: una interfaz de línea de comandos (CLI), un
+intérprete de comandos y una interfaz web. Se eliminan las
+dependencias y referencias a la herramienta **Gemini**, centrándose en
+el uso de **g4f** como motor de IA. Además, se añaden límites de
+entrada y comandos adicionales para un uso más profesional.
+
+## Contenido
+
+* `webui/` – Servidor HTTP y archivos estáticos que ofrecen una
+  interfaz gráfica en el navegador. Permite cambiar entre vista de
+  consola, chat y modo intérprete. Se apoya en un stub de g4f para
+  generar respuestas. Ejecuta `node webui/server.js` y abre
+  `http://localhost:3000` en el navegador.
+
+* `g4f-cli.js` – Script de Node.js que unifica la interacción por
+  consola. Ofrece tres modos (`cli`, `chat` e `interpreter`),
+  comandos barra (`/help`, `/mode`, `/stats`, etc.), historial de
+  comandos y ejecución de órdenes de shell con un directorio de
+  trabajo persistente. Para iniciarlo, ejecute:
+
+  ```sh
+  node g4f-cli.js
+  ```
+
+* `gemini-cli.js` – Alias que inicia la CLI unificada. Permite
+  ejecutar el modo consola escribiendo simplemente `node
+  gemini-cli.js`.
+
+* `gemini-web.js` – Alias que inicia el servidor web. Arranca el
+  servidor de la carpeta `webui` al ejecutar `node gemini-web.js`.
+
+* `gemini-cli/` – Carpeta residual del proyecto original de Gemini
+  CLI. Ya no se utiliza y se conserva únicamente como referencia.
+
+## Uso
+
+### Web UI
+
+1. Instale las dependencias con `npm install` si fuera necesario.
+2. Inicie el servidor ejecutando `node gemini-web.js` (o
+   alternativamente `node webui/server.js`).
+3. Abra su navegador en `http://localhost:3000`. Podrá enviar
+   mensajes al modelo, ejecutar comandos de intérprete y cambiar de
+   modo. Los comandos de barra permiten mostrar ayuda,
+   estadísticas y borrar el historial.
+
+### CLI
+
+Ejecute `node gemini-cli.js` (o `node g4f-cli.js`) en la raíz del
+proyecto. Por defecto
+comenzará en modo `cli`. Escriba `/help` para ver los comandos
+disponibles. El tamaño máximo de entrada está limitado a evitar
+abusos (10.000 caracteres). Cambie de modo con `/mode chat` o
+`/mode interpreter`.
+
+## Eliminación de referencias a Gemini
+
+Aunque el directorio `gemini-cli` permanece en el repositorio, el
+código de la herramienta Gemini no se utiliza ni se hace referencia
+en la interfaz web ni en la CLI. Toda la interacción se realiza a
+través de g4f o mediante un stub local. Para limpiar por completo
+esta referencia, puede eliminar la carpeta `gemini-cli` si lo
+desea.
+
+## Límites y medidas de seguridad
+
+* El servidor web y la CLI rechazan peticiones excesivamente largas
+  para proteger contra abusos.
+* El intérprete de comandos bloquea órdenes destructivas comunes como
+  `rm`, `shutdown`, `reboot` o `sudo`.
+* La variable `currentDir` garantiza que las órdenes de shell se
+  ejecutan siempre en un directorio autorizado y que los cambios con
+  `cd` persisten a lo largo de la sesión.
+
+## Mecánismos adicionales
+
+Para mejorar la usabilidad, la CLI incorpora varios comandos de barra.  Además de los
+comandos básicos de ayuda, limpieza y cambio de modo, se incluyen:
+
+- **/models** – Lista los modelos disponibles.
+- **/model &lt;nombre&gt;** – Cambia el modelo actual utilizado por la IA.
+- **/auto** – Selecciona automáticamente el modelo predeterminado.
+- **/time** – Muestra la fecha y la hora local.
+- **/date** – Muestra solo la fecha local.
+- **/reset** – Reinicia estadísticas e historial.
+- **/echo &lt;texto&gt;** – Repite el texto proporcionado.
+- **/count &lt;texto&gt;** – Devuelve la longitud del texto dado.
+
+La interfaz web incluye además un selector desplegable para elegir el
+modelo de IA en cada petición, con una opción *auto* que activa la
+selección automática. Si una solicitud al modelo falla o no devuelve
+resultado, la aplicación recurre a un “plan B” y devuelve una
+respuesta simulada etiquetada como `[Stub] …`.
+
+## Contribución
+
+Las aportaciones son bienvenidas. Por favor, asegúrese de no
+introducir dependencias de Gemini ni violar las restricciones
+mencionadas arriba. Para ampliar las capacidades de IA, se puede
+modificar la función `callG4F` en `g4f-cli.js` o el manejador
+correspondiente en `webui/public/index.html`.
