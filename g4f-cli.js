@@ -5,10 +5,8 @@
  * This script provides a command‑line interface that unifies a chat
  * conversational mode, a CLI style prompt and an interpreter for
  * executing shell commands. The functionality mirrors the behaviour
- * offered by the web UI in this project. It does not rely on the
- * Gemini CLI and instead uses a simple stub to simulate responses
- * from a generative AI. Should you wish to plug this CLI into a
- * real model, adapt the `callG4F` function accordingly.
+ * offered by the web UI in this project. Responses are obtained
+ * directly from the `g4f` package without any stubbed behaviour.
  *
  * Usage:
  *   node g4f‑cli.js
@@ -33,10 +31,8 @@ const g4f = new G4F();
 // required for your environment.
 const MAX_INPUT_LENGTH = 10000;
 
-// Available model names. These identifiers are passed through to
-// the g4f stub. In a real implementation you can modify this
-// array to reflect actual supported models. The first entry is
-// used as the default.
+// Available model names used when contacting g4f. Modify this
+// array to reflect the models supported in your environment.
 const MODELS = ['gpt-4.1', 'gpt-3.5-turbo', 'gpt-4', 'claude-3-opus'];
 
 // Current model selected by the user. Defaults to the first
@@ -61,21 +57,16 @@ let shellCount = 0;
 const commandHistory = [];
 
 /**
- * Simulate a call to a generative model. In a production scenario
- * this function can be replaced with calls to g4f or another API.
+ * Request a completion from g4f using the currently selected model.
  *
  * @param {string} prompt The user prompt.
- * @returns {Promise<string>} A simulated AI response.
+ * @returns {Promise<string>} The model response text, or an empty
+ *   string if no response was returned.
  */
 async function callG4F(prompt) {
-  try {
-    const messages = [{ role: 'user', content: prompt }];
-    const text = await g4f.chatCompletion(messages, { model: currentModel });
-    if (text) return text;
-  } catch (err) {
-    // Ignore and fall back to stub
-  }
-  return `[Stub] Respuesta simulada a: ${prompt}`;
+  const messages = [{ role: 'user', content: prompt }];
+  const text = await g4f.chatCompletion(messages, { model: currentModel });
+  return text || '';
 }
 
 /**
@@ -327,15 +318,14 @@ async function handleLine(line) {
       commandHistory.push(trimmed);
       aiCount++;
       try {
-        let response = await callG4F(trimmed);
-        if (!response) {
-          // Fallback when model fails
-          response = `[Stub] Respuesta simulada a: ${trimmed}`;
+        const response = await callG4F(trimmed);
+        if (response) {
+          console.log(response);
+        } else {
+          console.log('Sin respuesta del modelo.');
         }
-        console.log(response);
       } catch (err) {
-        // Fallback to stub if call fails
-        console.log(`[Stub] Respuesta simulada a: ${trimmed}`);
+        console.log(`[Error] ${err.message}`);
       }
       break;
     }

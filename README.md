@@ -5,8 +5,8 @@ originalmente separados: una interfaz de línea de comandos (CLI), un
 intérprete de comandos y una interfaz web. Se eliminan las
 dependencias y referencias a la herramienta **Gemini**, centrándose en
 el uso de **g4f** como motor de IA. Internamente se emplea la librería
-`g4f` de npm para realizar las peticiones, con una respuesta simulada
-cuando el servicio no está disponible. Además, se añaden límites de
+`g4f` de npm para realizar directamente las peticiones al modelo.
+Además, se añaden límites de
 entrada y comandos adicionales para un uso más profesional.
 
 ## Contenido
@@ -93,11 +93,10 @@ comandos básicos de ayuda, limpieza y cambio de modo, se incluyen:
 - **/echo &lt;texto&gt;** – Repite el texto proporcionado.
 - **/count &lt;texto&gt;** – Devuelve la longitud del texto dado.
 
-La interfaz web incluye además un selector desplegable para elegir el
-modelo de IA en cada petición, con una opción *auto* que activa la
-selección automática. Si una solicitud al modelo falla o no devuelve
-resultado, la aplicación recurre a un “plan B” y devuelve una
-respuesta simulada etiquetada como `[Stub] …`.
+ La interfaz web incluye además un selector desplegable para elegir el
+ modelo de IA en cada petición, con una opción *auto* que activa la
+ selección automática. Si una solicitud al modelo falla se mostrará un
+ mensaje de error en lugar de una respuesta simulada.
 
 ## Contribución
 
@@ -106,3 +105,19 @@ introducir dependencias de Gemini ni violar las restricciones
 mencionadas arriba. Para ampliar las capacidades de IA, se puede
 modificar la función `callG4F` en `g4f-cli.js` o el manejador
 correspondiente en `webui/public/index.html`.
+
+## Cyrah (xdtest)
+
+Dentro del directorio `xdtest` se incluye un conjunto adicional de
+utilidades basado en TypeScript que expone el comando `cyrah`. Al
+instalar este paquete de forma global (`npm install -g .`) estarán
+disponibles los binarios `cyrah` y `cyrah-auto` junto al resto de
+herramientas. Puede ejecutarlos de la siguiente manera:
+
+```sh
+cyrah --help
+cyrah-auto
+```
+
+Estas aplicaciones aprovechan la misma infraestructura que el resto del
+proyecto para ofrecer un intérprete ampliado y opciones extra.

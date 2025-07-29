@@ -507,8 +507,7 @@ async function sendMessage() {
       });
       let fullText = (result?.choices?.[0]?.message?.content) || '';
       if (!fullText) {
-        // Fallback when the model does not respond
-        fullText = `[Stub] Respuesta simulada a: ${message}`;
+        fullText = '[Sin respuesta del modelo]';
       }
       let index = 0;
       const interval = setInterval(() => {
@@ -550,7 +549,7 @@ async function sendMessage() {
       });
       let fullText = (result?.choices?.[0]?.message?.content) || '';
       if (!fullText) {
-        fullText = `[Stub] Respuesta simulada a: ${message}`;
+        fullText = '[Sin respuesta del modelo]';
       }
       let index = 0;
       const interval = setInterval(() => {
