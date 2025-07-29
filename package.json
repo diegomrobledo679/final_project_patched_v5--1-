@@ -14,7 +14,7 @@
   "scripts": {
     "start": "node g4f-cli.js",
     "web": "node gemini-web.js",
-    "test": "echo \"No tests specified\"",
+    "test": "echo \"No tests specified\""
   },
   "workspaces": ["xdtest"],
   "keywords": ["g4f", "cli", "web"],
