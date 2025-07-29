@@ -2,6 +2,7 @@
   "name": "g4f-unified-interface",
   "version": "1.0.0",
   "description": "Unified CLI and web interface for g4f without Gemini dependencies",
+  "main": "g4f-cli.js",
   "bin": {
     "g4f-cli": "g4f-cli.js",
     "gemini-cli": "gemini-cli.js",
@@ -11,17 +12,21 @@
     "cyrah-auto": "xdtest/dist/bin/cyrah-auto.js"
   },
   "scripts": {
-    "start": "node g4f-cli.js",
-    "web": "node gemini-web.js",
-    "test": "echo \"No tests specified\""
+    "start":        "node g4f-cli.js",
+    "web":          "node gemini-web.js",
+    "g4f":          "node g4f-cli.js",
+    "gemini":       "node gemini-cli.js",
+    "menu":         "node g4f-menu.js",
+    "cyrah":        "node xdtest/dist/bin/cyrah.js",
+    "cyrah-auto":   "node xdtest/dist/bin/cyrah-auto.js",
+    "test":         "echo No tests specified"
   },
   "workspaces": ["xdtest"],
   "keywords": ["g4f", "cli", "web"],
   "license": "Apache-2.0",
   "dependencies": {
-    "g4f": "^1.4.6",
     "dotenv": "^16.4.5",
+    "g4f": "^1.4.6",
     "minimist": "^1.2.8"
   }
 }
-
