@@ -22,6 +22,8 @@ const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const { G4F } = require('g4f');
+const pkg = require('./package.json');
+const VERSION = pkg.version || 'dev';
 
 // Create a single reusable client for all requests
 const g4f = new G4F();
@@ -106,6 +108,7 @@ function showHelp() {
   console.log('  /date            Muestra solo la fecha actual.');
   console.log('  /echo <txt>      Repite el texto introducido.');
   console.log('  /count <txt>     Indica la longitud del texto.');
+  console.log('  /version         Muestra la versión de la herramienta.');
   console.log('');
 }
 
@@ -221,6 +224,10 @@ async function handleSlashCommand(line) {
       } else {
         console.log(`Longitud: ${args.length}`);
       }
+      return true;
+    }
+    case 'version': {
+      console.log(`Versión: ${VERSION}`);
       return true;
     }
     case 'date': {
