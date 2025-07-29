@@ -97,10 +97,10 @@ function printPrompt() {
 function showHelp() {
   console.log('Comandos disponibles:');
   console.log('  /help            Muestra esta ayuda.');
-  console.log('  /clear           Limpia la pantalla de salida.');
+  console.log('  /clear           Limpia la pantalla de salida. (alias: /cls)');
   console.log('  /mode [tipo]     Cambia de modo (cli, chat o interpreter).');
-  console.log('  /quit            Termina la sesión.');
-  console.log('  /cwd             Muestra el directorio de trabajo actual.');
+  console.log('  /quit            Termina la sesión. (alias: /exit)');
+  console.log('  /cwd             Muestra el directorio de trabajo actual. (alias: /pwd)');
   console.log('  /shell <cmd>     Ejecuta un comando de shell en modo interpreter desde cualquier modo.');
   console.log('  /stats           Muestra estadísticas de uso (solicitudes AI y comandos de shell).');
   console.log('  /history         Lista los comandos introducidos en esta sesión.');
@@ -131,6 +131,7 @@ async function handleSlashCommand(line) {
       showHelp();
       return true;
     case 'clear':
+    case 'cls':
       // Clear the terminal by printing the ANSI escape sequence
       process.stdout.write('\x1Bc');
       return true;
@@ -143,10 +144,12 @@ async function handleSlashCommand(line) {
       }
       return true;
     case 'quit':
+    case 'exit':
       console.log('Sesión terminada.');
       process.exit(0);
       return true;
     case 'cwd':
+    case 'pwd':
       console.log(`Directorio actual: ${currentDir}`);
       return true;
     case 'shell':
