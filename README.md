@@ -34,6 +34,10 @@ entrada y comandos adicionales para un uso más profesional.
 * `gemini-web.js` – Alias que inicia el servidor web. Arranca el
   servidor de la carpeta `webui` al ejecutar `node gemini-web.js`.
 
+* `g4f-menu.js` – Presenta un pequeño menú en la terminal para
+  escoger entre iniciar la CLI, la interfaz web o las utilidades de
+  `xdtest`.
+
 * `gemini-cli/` – Carpeta residual del proyecto original de Gemini
   CLI. Ya no se utiliza y se conserva únicamente como referencia.
 
@@ -64,6 +68,13 @@ abusos (10.000 caracteres). Cambie de modo con `/mode chat` o
 Si no se especifica otro valor, el proveedor por defecto para las
 peticiones de IA es **g4f**, que selecciona automáticamente un backend
 disponible.
+
+### Menú interactivo
+
+Ejecute `node g4f-menu.js` para mostrar un menú que permite lanzar la
+CLI, la interfaz web o la utilidad `cyrah`. Si instala el paquete de
+forma global, podrá invocar simplemente `g4f-menu` desde cualquier
+directorio.
 
 ## Eliminación de referencias a Gemini
 
