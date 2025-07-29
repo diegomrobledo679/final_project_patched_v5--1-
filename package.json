@@ -2,14 +2,14 @@
   "name": "g4f-unified-interface",
   "version": "1.0.2",
   "description": "Unified CLI and web interface for g4f (no Gemini deps)",
-  "main": "./g4f-cli.js",
+  "main": "g4f-cli.js",
   "bin": {
-    "g4f-cli":    "./g4f-cli.js",
-    "gemini-cli": "./gemini-cli.js",
-    "gemini-web": "./gemini-web.js",
-    "g4f-menu":   "./g4f-menu.js",
-    "cyrah":      "./xdtest/dist/bin/cyrah.js",
-    "cyrah-auto": "./xdtest/dist/bin/cyrah-auto.js"
+    "g4f-cli":    "g4f-cli.js",
+    "gemini-cli": "gemini-cli.js",
+    "gemini-web": "gemini-web.js",
+    "g4f-menu":   "g4f-menu.js",
+    "cyrah":      "xdtest/dist/bin/cyrah.js",
+    "cyrah-auto": "xdtest/dist/bin/cyrah-auto.js"
   },
   "scripts": {
     "start":  "node g4f-cli.js",
