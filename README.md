@@ -5,8 +5,8 @@ originalmente separados: una interfaz de línea de comandos (CLI), un
 intérprete de comandos y una interfaz web. Se eliminan las
 dependencias y referencias a la herramienta **Gemini**, centrándose en
 el uso de **g4f** como motor de IA. Internamente se emplea la librería
-`g4f` de npm para realizar las peticiones, con una respuesta simulada
-cuando el servicio no está disponible. Además, se añaden límites de
+`g4f` de npm para realizar directamente las peticiones al modelo.
+Además, se añaden límites de
 entrada y comandos adicionales para un uso más profesional.
 
 ## Contenido
@@ -93,11 +93,10 @@ comandos básicos de ayuda, limpieza y cambio de modo, se incluyen:
 - **/echo &lt;texto&gt;** – Repite el texto proporcionado.
 - **/count &lt;texto&gt;** – Devuelve la longitud del texto dado.
 
-La interfaz web incluye además un selector desplegable para elegir el
-modelo de IA en cada petición, con una opción *auto* que activa la
-selección automática. Si una solicitud al modelo falla o no devuelve
-resultado, la aplicación recurre a un “plan B” y devuelve una
-respuesta simulada etiquetada como `[Stub] …`.
+ La interfaz web incluye además un selector desplegable para elegir el
+ modelo de IA en cada petición, con una opción *auto* que activa la
+ selección automática. Si una solicitud al modelo falla se mostrará un
+ mensaje de error en lugar de una respuesta simulada.
 
 ## Contribución
 

@@ -67,20 +67,26 @@ const server = http.createServer((req, res) => {
         const parsed = JSON.parse(body || '{}');
         const message = typeof parsed.message === 'string' ? parsed.message : '';
         const model = typeof parsed.model === 'string' ? parsed.model : 'gpt-4.1';
-        let text;
         try {
-          text = await g4f.chatCompletion([{ role: 'user', content: message }], { model });
+          const text = await g4f.chatCompletion(
+            [{ role: 'user', content: message }],
+            { model }
+          );
+          if (text) {
+            const json = JSON.stringify({ response: text });
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+            res.end(json);
+          } else {
+            res.statusCode = 502;
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+            res.end(JSON.stringify({ error: 'Empty response from g4f' }));
+          }
         } catch (apiErr) {
-          // ignore and fall back
+          res.statusCode = 502;
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.end(JSON.stringify({ error: 'Failed to process request' }));
         }
-        if (!text) {
-          text = `g4f stub response to: ${message}`;
-        }
-        const responsePayload = { response: text };
-        const json = JSON.stringify(responsePayload);
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        res.end(json);
       } catch (err) {
         res.statusCode = 400;
         res.setHeader('Content-Type', 'application/json; charset=utf-8');
