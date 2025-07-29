@@ -38,7 +38,7 @@ export async function main() {
     debug: argv.debug !== undefined ? argv.debug : envBool(process.env.DEBUG, false),
     safeMode: argv.safeMode || process.env.SAFE_MODE || config.defaultSafeMode,
     maxOutput: argv.maxOutput !== undefined ? parseInt(argv.maxOutput, 10) : envNumber(process.env.MAX_OUTPUT, config.defaultMaxOutput),
-    llmProvider: argv.llmProvider || process.env.LLM_PROVIDER,
+    llmProvider: argv.llmProvider || process.env.LLM_PROVIDER || 'g4f',
     llmModel: argv.llmModel || process.env.LLM_MODEL,
     llmApiKey: argv.llmApiKey || process.env.LLM_API_KEY || (process.env.LLM_PROVIDER === 'ollama' ? process.env.OLLAMA_API_KEY : process.env.OPENAI_API_KEY),
     llmBaseUrl: argv.llmBaseUrl || process.env.LLM_BASE_URL || (process.env.LLM_PROVIDER === 'openai' ? process.env.OPENAI_BASE_URL : process.env.OLLAMA_BASE_URL),

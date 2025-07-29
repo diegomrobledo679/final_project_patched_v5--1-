@@ -61,6 +61,10 @@ disponibles. El tamaño máximo de entrada está limitado a evitar
 abusos (10.000 caracteres). Cambie de modo con `/mode chat` o
 `/mode interpreter`.
 
+Si no se especifica otro valor, el proveedor por defecto para las
+peticiones de IA es **g4f**, que selecciona automáticamente un backend
+disponible.
+
 ## Eliminación de referencias a Gemini
 
 Aunque el directorio `gemini-cli` permanece en el repositorio, el

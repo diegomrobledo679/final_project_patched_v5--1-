@@ -23,7 +23,7 @@ export class Llm {
     }
     setLlmSettings(options) {
         var _a, _b;
-        this.llmProvider = options.llmProvider || process.env.LLM_PROVIDER || 'openai';
+        this.llmProvider = options.llmProvider || process.env.LLM_PROVIDER || 'g4f';
         this.model = options.llmModel || process.env.LLM_MODEL || Models.GPT_4O;
         this.llmApiKey =
             options.llmApiKey ||

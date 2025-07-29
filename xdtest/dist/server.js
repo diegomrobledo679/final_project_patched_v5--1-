@@ -40,7 +40,7 @@ export function createInterpreter() {
         debug: envBool(process.env.DEBUG, false),
         safeMode: process.env.SAFE_MODE || config.defaultSafeMode,
         maxOutput: envNumber(process.env.MAX_OUTPUT, config.defaultMaxOutput),
-        llmProvider: process.env.LLM_PROVIDER,
+        llmProvider: process.env.LLM_PROVIDER || 'g4f',
         llmModel: process.env.LLM_MODEL,
         llmApiKey: process.env.LLM_API_KEY || (process.env.LLM_PROVIDER === 'ollama' ? process.env.OLLAMA_API_KEY : process.env.OPENAI_API_KEY),
         llmBaseUrl: process.env.LLM_BASE_URL || (process.env.LLM_PROVIDER === 'openai' ? process.env.OPENAI_BASE_URL : process.env.OLLAMA_BASE_URL),
