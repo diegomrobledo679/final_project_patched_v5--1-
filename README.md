@@ -130,6 +130,13 @@ instalar este paquete de forma global (`npm install -g .`) estarán
 disponibles los binarios `cyrah` y `cyrah-auto` junto al resto de
 herramientas. Puede ejecutarlos de la siguiente manera:
 
+Antes de usar `cyrah` por primera vez asegúrese de compilar los
+archivos TypeScript:
+
+```sh
+npm --workspace=xdtest run build
+```
+
 ```sh
 cyrah --help
 cyrah-auto
