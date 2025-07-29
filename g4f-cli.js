@@ -57,11 +57,11 @@ let shellCount = 0;
 const commandHistory = [];
 
 /**
- * Simulate a call to a generative model. In a production scenario
- * this function can be replaced with calls to g4f or another API.
+ * Request a completion from g4f using the currently selected model.
  *
  * @param {string} prompt The user prompt.
- * @returns {Promise<string>} A simulated AI response.
+ * @returns {Promise<string>} The model response text, or an empty
+ *   string if no response was returned.
  */
 async function callG4F(prompt) {
   const messages = [{ role: 'user', content: prompt }];
