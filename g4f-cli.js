@@ -36,7 +36,9 @@ const MAX_INPUT_LENGTH = 10000;
 
 // Available model names used when contacting g4f. Modify this
 // array to reflect the models supported in your environment.
-const MODELS = ['gpt-4.1', 'gpt-3.5-turbo', 'gpt-4', 'claude-3-opus'];
+const MODELS = process.env.MODELS
+  ? process.env.MODELS.split(',').map((m) => m.trim()).filter(Boolean)
+  : ['gpt-4.1', 'gpt-3.5-turbo', 'gpt-4', 'claude-3-opus'];
 
 // Current model selected by the user. Defaults to the first
 // available model.
@@ -50,7 +52,9 @@ let mode = 'cli';
 // behaviour of the web UI and server. All shell commands execute
 // relative to this directory. Initialise to the process working
 // directory.
-let currentDir = process.cwd();
+let currentDir = process.env.START_DIR
+  ? path.resolve(process.env.START_DIR)
+  : process.cwd();
 
 // Counters for statistics.
 let aiCount = 0;
@@ -58,6 +62,11 @@ let shellCount = 0;
 
 // History of commands entered during this session.
 const commandHistory = [];
+
+// Conversation memory used when contacting the AI. Each element is
+// a message object with a role and content so that context is
+// preserved across requests.
+let conversation = [];
 
 /**
  * Request a completion from g4f using the currently selected model.
@@ -67,11 +76,14 @@ const commandHistory = [];
  *   string if no response was returned.
  */
 async function callG4F(prompt) {
-  const messages = [{ role: 'user', content: prompt }];
-  const text = await g4f.chatCompletion(messages, {
+  conversation.push({ role: 'user', content: prompt });
+  const text = await g4f.chatCompletion(conversation, {
     model: currentModel,
     provider: g4f.providers.any,
   });
+  if (text) {
+    conversation.push({ role: 'assistant', content: text });
+  }
   return text || '';
 }
 
@@ -113,6 +125,8 @@ function showHelp() {
   console.log('  /echo <txt>      Repite el texto introducido.');
   console.log('  /count <txt>     Indica la longitud del texto.');
   console.log('  /version         Muestra la versión de la herramienta.');
+  console.log('  /save <archivo>  Guarda la conversación en un archivo JSON.');
+  console.log('  /load <archivo>  Carga una conversación previamente guardada.');
   console.log('');
 }
 
@@ -206,6 +220,7 @@ async function handleSlashCommand(line) {
       aiCount = 0;
       shellCount = 0;
       commandHistory.length = 0;
+      conversation = [];
       console.log('Se han restablecido estadísticas e historial.');
       return true;
     }
@@ -235,6 +250,30 @@ async function handleSlashCommand(line) {
     }
     case 'version': {
       console.log(`Versión: ${VERSION}`);
+      return true;
+    }
+    case 'save': {
+      const file = args.trim() || 'conversation.json';
+      try {
+        fs.writeFileSync(file, JSON.stringify(conversation, null, 2));
+        console.log(`Conversación guardada en ${file}`);
+      } catch (err) {
+        console.log(`Error al guardar: ${err.message}`);
+      }
+      return true;
+    }
+    case 'load': {
+      if (!args) {
+        console.log('Uso: /load <archivo>');
+        return true;
+      }
+      try {
+        const data = fs.readFileSync(args.trim(), 'utf8');
+        conversation = JSON.parse(data);
+        console.log('Conversación cargada.');
+      } catch (err) {
+        console.log(`Error al cargar: ${err.message}`);
+      }
       return true;
     }
     case 'date': {
