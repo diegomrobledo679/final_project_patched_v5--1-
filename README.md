@@ -64,6 +64,16 @@ disponibles. El tamaño máximo de entrada está limitado a evitar
 abusos (10.000 caracteres). Cambie de modo con `/mode chat` o
 `/mode interpreter`.
 
+codex/cambiar-g4f-de-provider-a-auto
+proyecto. También puede iniciarlo con `npm start`. Si instala el
+paquete de forma global (`npm install -g .`) podrá invocar simplemente
+`g4f-cli` o `gemini-web` desde cualquier directorio.
+=======
+proyecto. Si instala el paquete de forma global (`npm install -g .`)
+podrá invocar simplemente `g4f-cli` o `gemini-web` desde cualquier
+directorio.
+Si al ejecutar `gemini-cli` en Windows aparece un mensaje "Cannot find module", instale el proyecto con `npm install -g .` y asegurese de que la carpeta global de npm este en la variable PATH. Como alternativa, ejecute la herramienta con `node %AppData%\npm\node_modules\g4f-unified-interface\gemini-cli.js`.
+
 Si no se especifica otro valor, el proveedor por defecto para las
 peticiones de IA es **g4f**, que selecciona automáticamente un backend
 disponible.
