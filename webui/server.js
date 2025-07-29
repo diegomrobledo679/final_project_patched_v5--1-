@@ -70,7 +70,7 @@ const server = http.createServer((req, res) => {
         try {
           const text = await g4f.chatCompletion(
             [{ role: 'user', content: message }],
-            { model }
+            { model, provider: g4f.providers.any }
           );
           if (text) {
             const json = JSON.stringify({ response: text });
