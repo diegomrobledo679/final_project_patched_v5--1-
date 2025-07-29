@@ -67,7 +67,10 @@ const commandHistory = [];
  */
 async function callG4F(prompt) {
   const messages = [{ role: 'user', content: prompt }];
-  const text = await g4f.chatCompletion(messages, { model: currentModel });
+  const text = await g4f.chatCompletion(messages, {
+    model: currentModel,
+    provider: g4f.providers.any,
+  });
   return text || '';
 }
 
