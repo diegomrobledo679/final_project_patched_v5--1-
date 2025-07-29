@@ -2,10 +2,12 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { G4F } = require('g4f');
+require('dotenv').config();
 
 // Reusable g4f client
 const g4f = new G4F();
 
+const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "gpt-4.1";
 // SPDX-License-Identifier: Apache-2.0
 
 const publicDir = path.join(__dirname, 'public');
@@ -66,7 +68,7 @@ const server = http.createServer((req, res) => {
       try {
         const parsed = JSON.parse(body || '{}');
         const message = typeof parsed.message === 'string' ? parsed.message : '';
-        const model = typeof parsed.model === 'string' ? parsed.model : 'gpt-4.1';
+        const model = typeof parsed.model === 'string' ? parsed.model : DEFAULT_MODEL;
         try {
           const text = await g4f.chatCompletion(
             [{ role: 'user', content: message }],

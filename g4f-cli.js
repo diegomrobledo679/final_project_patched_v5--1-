@@ -22,6 +22,7 @@ const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const { G4F } = require('g4f');
+require('dotenv').config();
 const pkg = require('./package.json');
 const VERSION = pkg.version || 'dev';
 
@@ -39,7 +40,7 @@ const MODELS = ['gpt-4.1', 'gpt-3.5-turbo', 'gpt-4', 'claude-3-opus'];
 
 // Current model selected by the user. Defaults to the first
 // available model.
-let currentModel = MODELS[0];
+let currentModel = process.env.DEFAULT_MODEL && MODELS.includes(process.env.DEFAULT_MODEL) ? process.env.DEFAULT_MODEL : MODELS[0];
 
 // Track the current mode: 'cli', 'chat' or 'interpreter'. Defaults
 // to 'cli'.
