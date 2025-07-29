@@ -57,9 +57,7 @@ entrada y comandos adicionales para un uso más profesional.
 ### CLI
 
 Ejecute `node gemini-cli.js` (o `node g4f-cli.js`) en la raíz del
-proyecto. También puede iniciarlo con `npm start`. Si instala el
-paquete de forma global (`npm install -g .`) podrá invocar simplemente
-`g4f-cli` o `gemini-web` desde cualquier directorio.
+
 Por defecto
 comenzará en modo `cli`. Escriba `/help` para ver los comandos
 disponibles. El tamaño máximo de entrada está limitado a evitar

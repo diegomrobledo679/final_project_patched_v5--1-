@@ -6,4 +6,6 @@
  * directorio.
  */
 
-require('./g4f-cli.js');
+const path = require('path');
+const cliPath = path.join(__dirname, 'g4f-cli.js');
+require(cliPath);
