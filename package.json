@@ -15,7 +15,6 @@
     "start": "node g4f-cli.js",
     "web": "node gemini-web.js",
     "test": "echo \"No tests specified\"",
-    "prepare": "npm --workspace=xdtest run build"
   },
   "workspaces": ["xdtest"],
   "keywords": ["g4f", "cli", "web"],
