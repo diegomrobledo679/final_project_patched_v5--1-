@@ -96,6 +96,7 @@ comandos básicos de ayuda, limpieza y cambio de modo, se incluyen:
 - **/reset** – Reinicia estadísticas e historial.
 - **/echo &lt;texto&gt;** – Repite el texto proporcionado.
 - **/count &lt;texto&gt;** – Devuelve la longitud del texto dado.
+- **/version** – Muestra la versión actual de la herramienta.
 
  La interfaz web incluye además un selector desplegable para elegir el
  modelo de IA en cada petición, con una opción *auto* que activa la
