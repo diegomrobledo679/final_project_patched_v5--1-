@@ -163,6 +163,7 @@ menu to review, update, or unset variables. You can also load many variables at 
 The interpreter reads various settings from environment variables if corresponding CLI options are omitted. Useful variables include:
 
 - `LLM_PROVIDER` – Provider name like `openai`, `ollama`, or `g4f`.
+- If unset, `g4f` is used automatically as the provider.
 - `LLM_MODEL` – Model identifier to use.
 - `LLM_API_KEY` – API key for the provider.
 - `LLM_BASE_URL` – Base URL for API requests.
