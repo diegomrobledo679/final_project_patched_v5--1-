@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cyrah Web Interface</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #log { white-space: pre-wrap; border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+  </style>
+</head>
+<body>
+  <h1>Cyrah Web Interface</h1>
+  <div id="log"></div>
+  <input type="text" id="input" placeholder="Type a message" style="width:80%" />
+  <button id="send">Send</button>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const log = document.getElementById('log');
+    document.getElementById('send').onclick = () => {
+      const msg = document.getElementById('input').value;
+      if (!msg) return;
+      log.textContent += '\nYou: ' + msg;
+      socket.emit('message', msg);
+      document.getElementById('input').value = '';
+    };
+    socket.on('response', (res) => {
+      log.textContent += `\n${res.role}: ${res.content}`;
+      log.scrollTop = log.scrollHeight;
+    });
+  </script>
+</body>
+</html>
