@@ -1,32 +1,47 @@
 {
   "name": "g4f-unified-interface",
-  "version": "1.0.0",
-  "description": "Unified CLI and web interface for g4f without Gemini dependencies",
-  "main": "g4f-cli.js",
+  "version": "1.0.2",
+  "description": "Unified CLI and web interface for g4f (no Gemini deps)",
+  "main": "./g4f-cli.js",
+  "type": "module",
   "bin": {
-    "g4f-cli": "g4f-cli.js",
-    "gemini-cli": "gemini-cli.js",
-    "gemini-web": "gemini-web.js",
-    "g4f-menu": "g4f-menu.js",
-    "cyrah": "xdtest/dist/bin/cyrah.js",
-    "cyrah-auto": "xdtest/dist/bin/cyrah-auto.js"
+    "g4f-cli":    "./g4f-cli.js",
+    "gemini-cli": "./gemini-cli.js",
+    "gemini-web": "./gemini-web.js",
+    "g4f-menu":   "./g4f-menu.js",
+    "cyrah":      "./xdtest/dist/bin/cyrah.js",
+    "cyrah-auto": "./xdtest/dist/bin/cyrah-auto.js"
   },
   "scripts": {
-    "start":        "node g4f-cli.js",
-    "web":          "node gemini-web.js",
-    "g4f":          "node g4f-cli.js",
-    "gemini":       "node gemini-cli.js",
-    "menu":         "node g4f-menu.js",
+    "start":  "node g4f-cli.js",
+    "web":    "node gemini-web.js",
+    "g4f":    "node g4f-cli.js",
+    "gemini": "node gemini-cli.js",
+    "menu":   "node g4f-menu.js",
     "cyrah":        "node xdtest/dist/bin/cyrah.js",
     "cyrah-auto":   "node xdtest/dist/bin/cyrah-auto.js",
-    "test":         "echo No tests specified"
+    "build":  "npm --workspace xdtest run build || echo \"(sin build)\"",
+    "test":   "echo \"No tests specified\""
   },
   "workspaces": ["xdtest"],
   "keywords": ["g4f", "cli", "web"],
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu‑usuario/g4f-unified-interface.git"
+  },
+  "author": "Diego Robledo <diegomrobledo1@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/tu‑usuario/g4f-unified-interface/issues"
+  },
+  "homepage": "https://github.com/tu‑usuario/g4f-unified-interface#readme",
   "dependencies": {
     "dotenv": "^16.4.5",
+    "express": "^4.18.4",
     "g4f": "^1.4.6",
     "minimist": "^1.2.8"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
