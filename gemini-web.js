@@ -6,4 +6,6 @@
  * adicional, edite el archivo webui/server.js directamente.
  */
 
-require('./webui/server.js');
+const path = require('path');
+const serverPath = path.join(__dirname, 'webui', 'server.js');
+require(serverPath);
