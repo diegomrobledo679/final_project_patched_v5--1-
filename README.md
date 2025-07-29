@@ -93,6 +93,13 @@ eliminar la carpeta `gemini-cli` si lo desea.
   ejecutan siempre en un directorio autorizado y que los cambios con
   `cd` persisten a lo largo de la sesión.
 
+Adicionalmente, puede personalizar el comportamiento mediante
+variables de entorno:
+
+* `MODELS` – Lista separada por comas de modelos disponibles para la
+  IA. Si se omite se usan los predeterminados.
+* `START_DIR` – Directorio inicial para el modo intérprete.
+
 ## Mecánismos adicionales
 
 Para mejorar la usabilidad, la CLI incorpora varios comandos de barra.  Además de los
@@ -107,6 +114,11 @@ comandos básicos de ayuda, limpieza y cambio de modo, se incluyen:
 - **/echo &lt;texto&gt;** – Repite el texto proporcionado.
 - **/count &lt;texto&gt;** – Devuelve la longitud del texto dado.
 - **/version** – Muestra la versión actual de la herramienta.
+- **/save &lt;archivo&gt;** – Guarda la conversación en un fichero JSON.
+- **/load &lt;archivo&gt;** – Carga una conversación guardada.
+
+La conversación se conserva entre peticiones dentro de una misma
+sesión, por lo que el modelo dispone de contexto completo.
 
  La interfaz web incluye además un selector desplegable para elegir el
  modelo de IA en cada petición, con una opción *auto* que activa la
@@ -135,6 +147,8 @@ archivos TypeScript:
 ```sh
 npm --workspace=xdtest run build
 ```
+También puede ejecutar `npm run build` en la raíz del repositorio para
+compilar automáticamente dicha carpeta junto con el resto del proyecto.
 
 ```sh
 cyrah --help
