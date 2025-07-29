@@ -15,10 +15,13 @@
     "web": "node gemini-web.js",
     "test": "echo \"No tests specified\""
   },
+  "workspaces": ["xdtest"],
   "keywords": ["g4f", "cli", "web"],
   "license": "Apache-2.0",
   "dependencies": {
-    "g4f": "^1.4.6"
+    "g4f": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "minimist": "^1.2.8"
   }
 }
 
