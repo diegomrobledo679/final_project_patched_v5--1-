@@ -23,6 +23,10 @@ const readline = require('readline');
 const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const { G4F } = require('g4f');
+
+// Create a single reusable client for all requests
+const g4f = new G4F();
 
 // Maximum length of a user input. Inputs longer than this will be
 // rejected to prevent abuse and resource exhaustion. Adjust as
@@ -64,11 +68,14 @@ const commandHistory = [];
  * @returns {Promise<string>} A simulated AI response.
  */
 async function callG4F(prompt) {
-  // Placeholder implementation. In a real setup you could import
-  // `node-fetch` or use the global fetch (Node 18+) to call a
-  // remote API. This stub simply echoes the prompt back with a
-  // prefix.
-  return `(${currentModel}) Respuesta simulada a: ${prompt}`;
+  try {
+    const messages = [{ role: 'user', content: prompt }];
+    const text = await g4f.chatCompletion(messages, { model: currentModel });
+    if (text) return text;
+  } catch (err) {
+    // Ignore and fall back to stub
+  }
+  return `[Stub] Respuesta simulada a: ${prompt}`;
 }
 
 /**

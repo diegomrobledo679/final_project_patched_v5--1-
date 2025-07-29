@@ -1,6 +1,10 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { G4F } = require('g4f');
+
+// Reusable g4f client
+const g4f = new G4F();
 
 // SPDX-License-Identifier: Apache-2.0
 
@@ -58,13 +62,21 @@ const server = http.createServer((req, res) => {
         req.socket.destroy();
       }
     });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const parsed = JSON.parse(body || '{}');
         const message = typeof parsed.message === 'string' ? parsed.message : '';
-        const responsePayload = {
-          response: `g4f stub response to: ${message}`,
-        };
+        const model = typeof parsed.model === 'string' ? parsed.model : 'gpt-4.1';
+        let text;
+        try {
+          text = await g4f.chatCompletion([{ role: 'user', content: message }], { model });
+        } catch (apiErr) {
+          // ignore and fall back
+        }
+        if (!text) {
+          text = `g4f stub response to: ${message}`;
+        }
+        const responsePayload = { response: text };
         const json = JSON.stringify(responsePayload);
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json; charset=utf-8');
