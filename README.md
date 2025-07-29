@@ -106,3 +106,19 @@ introducir dependencias de Gemini ni violar las restricciones
 mencionadas arriba. Para ampliar las capacidades de IA, se puede
 modificar la función `callG4F` en `g4f-cli.js` o el manejador
 correspondiente en `webui/public/index.html`.
+
+## Cyrah (xdtest)
+
+Dentro del directorio `xdtest` se incluye un conjunto adicional de
+utilidades basado en TypeScript que expone el comando `cyrah`. Al
+instalar este paquete de forma global (`npm install -g .`) estarán
+disponibles los binarios `cyrah` y `cyrah-auto` junto al resto de
+herramientas. Puede ejecutarlos de la siguiente manera:
+
+```sh
+cyrah --help
+cyrah-auto
+```
+
+Estas aplicaciones aprovechan la misma infraestructura que el resto del
+proyecto para ofrecer un intérprete ampliado y opciones extra.
