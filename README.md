@@ -64,11 +64,6 @@ disponibles. El tamaño máximo de entrada está limitado a evitar
 abusos (10.000 caracteres). Cambie de modo con `/mode chat` o
 `/mode interpreter`.
 
-codex/cambiar-g4f-de-provider-a-auto
-proyecto. También puede iniciarlo con `npm start`. Si instala el
-paquete de forma global (`npm install -g .`) podrá invocar simplemente
-`g4f-cli` o `gemini-web` desde cualquier directorio.
-=======
 proyecto. Si instala el paquete de forma global (`npm install -g .`)
 podrá invocar simplemente `g4f-cli` o `gemini-web` desde cualquier
 directorio.
