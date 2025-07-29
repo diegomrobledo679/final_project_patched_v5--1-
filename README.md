@@ -47,7 +47,8 @@ entrada y comandos adicionales para un uso más profesional.
 
 1. Instale las dependencias (incluida `g4f`) con `npm install`.
 2. Inicie el servidor ejecutando `node gemini-web.js` (o
-   alternativamente `node webui/server.js`).
+   alternativamente `node webui/server.js`). Puede usar también
+   `npm run web` para el mismo resultado.
 3. Abra su navegador en `http://localhost:3000`. Podrá enviar
    mensajes al modelo, ejecutar comandos de intérprete y cambiar de
    modo. Los comandos de barra permiten mostrar ayuda,
@@ -56,9 +57,9 @@ entrada y comandos adicionales para un uso más profesional.
 ### CLI
 
 Ejecute `node gemini-cli.js` (o `node g4f-cli.js`) en la raíz del
-proyecto. Si instala el paquete de forma global (`npm install -g .`)
-podrá invocar simplemente `g4f-cli` o `gemini-web` desde cualquier
-directorio.
+proyecto. También puede iniciarlo con `npm start`. Si instala el
+paquete de forma global (`npm install -g .`) podrá invocar simplemente
+`g4f-cli` o `gemini-web` desde cualquier directorio.
 Por defecto
 comenzará en modo `cli`. Escriba `/help` para ver los comandos
 disponibles. El tamaño máximo de entrada está limitado a evitar
