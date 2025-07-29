@@ -4,15 +4,17 @@ Este proyecto proporciona una versión unificada de tres mecanismos
 originalmente separados: una interfaz de línea de comandos (CLI), un
 intérprete de comandos y una interfaz web. Se eliminan las
 dependencias y referencias a la herramienta **Gemini**, centrándose en
-el uso de **g4f** como motor de IA. Además, se añaden límites de
+el uso de **g4f** como motor de IA. Internamente se emplea la librería
+`g4f` de npm para realizar las peticiones, con una respuesta simulada
+cuando el servicio no está disponible. Además, se añaden límites de
 entrada y comandos adicionales para un uso más profesional.
 
 ## Contenido
 
 * `webui/` – Servidor HTTP y archivos estáticos que ofrecen una
   interfaz gráfica en el navegador. Permite cambiar entre vista de
-  consola, chat y modo intérprete. Se apoya en un stub de g4f para
-  generar respuestas. Ejecuta `node webui/server.js` y abre
+  consola, chat y modo intérprete. Utiliza por defecto la API pública
+  de **g4f** para generar respuestas. Ejecuta `node webui/server.js` y abre
   `http://localhost:3000` en el navegador.
 
 * `g4f-cli.js` – Script de Node.js que unifica la interacción por
@@ -39,7 +41,7 @@ entrada y comandos adicionales para un uso más profesional.
 
 ### Web UI
 
-1. Instale las dependencias con `npm install` si fuera necesario.
+1. Instale las dependencias (incluida `g4f`) con `npm install`.
 2. Inicie el servidor ejecutando `node gemini-web.js` (o
    alternativamente `node webui/server.js`).
 3. Abra su navegador en `http://localhost:3000`. Podrá enviar
@@ -50,7 +52,10 @@ entrada y comandos adicionales para un uso más profesional.
 ### CLI
 
 Ejecute `node gemini-cli.js` (o `node g4f-cli.js`) en la raíz del
-proyecto. Por defecto
+proyecto. Si instala el paquete de forma global (`npm install -g .`)
+podrá invocar simplemente `g4f-cli` o `gemini-web` desde cualquier
+directorio.
+Por defecto
 comenzará en modo `cli`. Escriba `/help` para ver los comandos
 disponibles. El tamaño máximo de entrada está limitado a evitar
 abusos (10.000 caracteres). Cambie de modo con `/mode chat` o
@@ -61,9 +66,8 @@ abusos (10.000 caracteres). Cambie de modo con `/mode chat` o
 Aunque el directorio `gemini-cli` permanece en el repositorio, el
 código de la herramienta Gemini no se utiliza ni se hace referencia
 en la interfaz web ni en la CLI. Toda la interacción se realiza a
-través de g4f o mediante un stub local. Para limpiar por completo
-esta referencia, puede eliminar la carpeta `gemini-cli` si lo
-desea.
+través de **g4f**. Para limpiar por completo esta referencia, puede
+eliminar la carpeta `gemini-cli` si lo desea.
 
 ## Límites y medidas de seguridad
 

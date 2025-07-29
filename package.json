@@ -1,0 +1,21 @@
+{
+  "name": "g4f-unified-interface",
+  "version": "1.0.0",
+  "description": "Unified CLI and web interface for g4f without Gemini dependencies",
+  "bin": {
+    "g4f-cli": "g4f-cli.js",
+    "gemini-cli": "gemini-cli.js",
+    "gemini-web": "gemini-web.js"
+  },
+  "scripts": {
+    "start": "node g4f-cli.js",
+    "web": "node gemini-web.js",
+    "test": "echo \"No tests specified\""
+  },
+  "keywords": ["g4f", "cli", "web"],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "g4f": "^1.4.6"
+  }
+}
+
