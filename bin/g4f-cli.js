@@ -29,20 +29,27 @@ const VERSION = pkg.version || 'dev';
 // Create a single reusable client for all requests
 const g4f = new G4F();
 
+// List of providers to try, separated by "|". By default include all
+// known providers exposed by g4f.
+const PROVIDERS = (process.env.PROVIDERS || Object.keys(g4f.providers).join('|'))
+  .split('|')
+  .map((p) => p.trim())
+  .filter(Boolean);
+
 // Maximum length of a user input. Inputs longer than this will be
 // rejected to prevent abuse and resource exhaustion. Adjust as
 // required for your environment.
 const MAX_INPUT_LENGTH = 10000;
 
-// Available model names used when contacting g4f. Modify this
-// array to reflect the models supported in your environment.
+// Available model names used when contacting g4f. The list can be
+// provided via the MODELS env var using "|" as a separator.
 const MODELS = process.env.MODELS
-  ? process.env.MODELS.split(',').map((m) => m.trim()).filter(Boolean)
+  ? process.env.MODELS.split('|').map((m) => m.trim()).filter(Boolean)
   : ['gpt-4.1', 'gpt-3.5-turbo', 'gpt-4', 'claude-3-opus'];
 
-// Current model selected by the user. Defaults to the first
-// available model.
-let currentModel = process.env.DEFAULT_MODEL && MODELS.includes(process.env.DEFAULT_MODEL) ? process.env.DEFAULT_MODEL : MODELS[0];
+// Current model selection. Can contain multiple models separated by
+// "|" to allow automatic fallback.
+let currentModel = process.env.DEFAULT_MODEL || MODELS[0];
 
 // Track the current mode: 'cli', 'chat' or 'interpreter'. Defaults
 // to 'cli'.
@@ -77,14 +84,27 @@ let conversation = [];
  */
 async function callG4F(prompt) {
   conversation.push({ role: 'user', content: prompt });
-  const text = await g4f.chatCompletion(conversation, {
-    model: currentModel,
-    provider: g4f.providers.any,
-  });
-  if (text) {
-    conversation.push({ role: 'assistant', content: text });
+  const modelsToTry = currentModel.split('|').map((m) => m.trim()).filter(Boolean);
+  for (const providerName of PROVIDERS) {
+    const provider = g4f.providers[providerName];
+    if (!provider) continue;
+    for (const model of modelsToTry) {
+      try {
+        const text = await g4f.chatCompletion(conversation, {
+          model,
+          provider,
+        });
+        if (text) {
+          conversation.push({ role: 'assistant', content: text });
+          currentModel = model;
+          return text;
+        }
+      } catch (e) {
+        // Try next provider/model combination
+      }
+    }
   }
-  return text || '';
+  return '';
 }
 
 /**

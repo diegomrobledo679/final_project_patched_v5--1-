@@ -6,7 +6,8 @@ require('dotenv').config();
 
 // Reusable g4f client
 const g4f = new G4F();
-
+const ALL_PROVIDERS = Object.keys(g4f.providers).join('|');
+const DEFAULT_PROVIDERS = process.env.PROVIDERS || ALL_PROVIDERS;
 const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "gpt-4.1";
 // SPDX-License-Identifier: Apache-2.0
 
@@ -68,26 +69,35 @@ const server = http.createServer((req, res) => {
       try {
         const parsed = JSON.parse(body || '{}');
         const message = typeof parsed.message === 'string' ? parsed.message : '';
-        const model = typeof parsed.model === 'string' ? parsed.model : DEFAULT_MODEL;
-        try {
-          const text = await g4f.chatCompletion(
-            [{ role: 'user', content: message }],
-            { model, provider: g4f.providers.any }
-          );
-          if (text) {
-            const json = JSON.stringify({ response: text });
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json; charset=utf-8');
-            res.end(json);
-          } else {
-            res.statusCode = 502;
-            res.setHeader('Content-Type', 'application/json; charset=utf-8');
-            res.end(JSON.stringify({ error: 'Empty response from g4f' }));
+        const modelStr = typeof parsed.model === 'string' ? parsed.model : DEFAULT_MODEL;
+        const providerStr = typeof parsed.provider === 'string' ? parsed.provider : DEFAULT_PROVIDERS;
+        const models = modelStr.split('|').map((m) => m.trim()).filter(Boolean);
+        const providers = providerStr.split('|').map((p) => p.trim()).filter(Boolean);
+        let text = '';
+        outer: for (const providerName of providers) {
+          const provider = g4f.providers[providerName];
+          if (!provider) continue;
+          for (const model of models) {
+            try {
+              text = await g4f.chatCompletion(
+                [{ role: 'user', content: message }],
+                { model, provider }
+              );
+              if (text) break outer;
+            } catch (e) {
+              // Try next combination
+            }
           }
-        } catch (apiErr) {
+        }
+        if (text) {
+          const json = JSON.stringify({ response: text });
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.end(json);
+        } else {
           res.statusCode = 502;
           res.setHeader('Content-Type', 'application/json; charset=utf-8');
-          res.end(JSON.stringify({ error: 'Failed to process request' }));
+          res.end(JSON.stringify({ error: 'Empty response from g4f' }));
         }
       } catch (err) {
         res.statusCode = 400;
