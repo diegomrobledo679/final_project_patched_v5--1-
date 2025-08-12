@@ -1,7 +1,5 @@
 {
   "name": "g4f-unified-interface",
-  "version": "1.0.2",
-  "description": "Unified CLI and web interface for g4f (no Gemini deps)",
   "scripts": {
     "g4f-cli":    "g4f-cli.js",
     "gemini-cli": "gemini-cli.js",
