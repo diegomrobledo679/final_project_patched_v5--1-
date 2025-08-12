@@ -12,7 +12,8 @@ import { logger } from "../../utils/logger.js";
 import { assert } from "console";
 import { Role, MessageType } from "../types.js";
 import OpenAI from 'openai';
-import { G4F } from 'g4f';
+// @ts-ignore - External package lacks type definitions
+import { Client } from '@gpt4free/g4f.dev';
 export class Llm {
     constructor(interpreter, options) {
         this.temperature = 0;
@@ -23,7 +24,7 @@ export class Llm {
     }
     setLlmSettings(options) {
         var _a, _b;
-        this.llmProvider = options.llmProvider || process.env.LLM_PROVIDER || 'g4f';
+        this.llmProvider = options.llmProvider || process.env.LLM_PROVIDER || 'g4f.dev';
         this.model = options.llmModel || process.env.LLM_MODEL || Models.GPT_4O;
         this.llmApiKey =
             options.llmApiKey ||
@@ -32,8 +33,8 @@ export class Llm {
         this.llmBaseUrl = options.llmBaseUrl || process.env.LLM_BASE_URL;
         this.temperature = (_a = options.llmTemperature) !== null && _a !== void 0 ? _a : (process.env.LLM_TEMPERATURE ? parseFloat(process.env.LLM_TEMPERATURE) : this.temperature);
         this.maxTokens = (_b = options.llmMaxTokens) !== null && _b !== void 0 ? _b : (process.env.LLM_MAX_TOKENS ? parseInt(process.env.LLM_MAX_TOKENS, 10) : this.maxTokens);
-        if (this.llmProvider === 'g4f') {
-            this.g4f = new G4F();
+        if (this.llmProvider === 'g4f.dev') {
+            this.g4f = new Client();
         }
         else if (this.llmProvider === 'ollama') {
             this.llmBaseUrl = this.llmBaseUrl || process.env.OLLAMA_BASE_URL || 'http://localhost:11434/v1';
@@ -48,7 +49,7 @@ export class Llm {
                 throw new Error('No API key provided for OpenAI. Set LLM_API_KEY or OPENAI_API_KEY.');
             }
         }
-        if (this.llmProvider !== 'g4f') {
+        if (this.llmProvider !== 'g4f.dev') {
             this.openai = new OpenAI({
                 apiKey: this.llmApiKey,
                 baseURL: this.llmBaseUrl,
@@ -57,6 +58,7 @@ export class Llm {
     }
     run(messages, tools) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c;
             logger.debug("Llm.run called.");
             if (this.maxTokens && this.contextWindow && this.maxTokens > this.contextWindow) {
                 logger.warn("Warning: max_tokens is larger than context_window. Setting max_tokens to 0.2 times the context_window.");
@@ -68,9 +70,13 @@ export class Llm {
             logger.info(`Running LLM with model: ${model}`);
             logger.debug(`Messages sent to LLM: ${JSON.stringify(messages)}`);
             const preparedMessages = messages.map(msg => (Object.assign({ role: msg.role.toLowerCase(), content: msg.content }, (msg.tool_calls && { tool_calls: msg.tool_calls }))));
-            if (this.llmProvider === 'g4f' && this.g4f) {
+            if (this.llmProvider === 'g4f.dev' && this.g4f) {
                 const g4fMessages = preparedMessages.map(m => ({ role: m.role, content: m.content }));
-                const content = yield this.g4f.chatCompletion(g4fMessages);
+                const result = yield this.g4f.chat.completions.create({
+                    model,
+                    messages: g4fMessages,
+                });
+                const content = ((_c = (_b = (_a = result.choices) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.message) === null || _c === void 0 ? void 0 : _c.content) || '';
                 return { role: Role.Assistant, messageType: MessageType.Message, content };
             }
             const maxRetries = 3;

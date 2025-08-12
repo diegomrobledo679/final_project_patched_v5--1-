@@ -1,13 +1,11 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { G4F } = require('g4f');
+const { Client } = require('@gpt4free/g4f.dev');
 require('dotenv').config();
 
 // Reusable g4f client
-const g4f = new G4F();
-const ALL_PROVIDERS = Object.keys(g4f.providers).join('|');
-const DEFAULT_PROVIDERS = process.env.PROVIDERS || ALL_PROVIDERS;
+const g4f = new Client();
 const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "gpt-4.1";
 // SPDX-License-Identifier: Apache-2.0
 
@@ -70,23 +68,18 @@ const server = http.createServer((req, res) => {
         const parsed = JSON.parse(body || '{}');
         const message = typeof parsed.message === 'string' ? parsed.message : '';
         const modelStr = typeof parsed.model === 'string' ? parsed.model : DEFAULT_MODEL;
-        const providerStr = typeof parsed.provider === 'string' ? parsed.provider : DEFAULT_PROVIDERS;
         const models = modelStr.split('|').map((m) => m.trim()).filter(Boolean);
-        const providers = providerStr.split('|').map((p) => p.trim()).filter(Boolean);
         let text = '';
-        outer: for (const providerName of providers) {
-          const provider = g4f.providers[providerName];
-          if (!provider) continue;
-          for (const model of models) {
-            try {
-              text = await g4f.chatCompletion(
-                [{ role: 'user', content: message }],
-                { model, provider }
-              );
-              if (text) break outer;
-            } catch (e) {
-              // Try next combination
-            }
+        for (const model of models) {
+          try {
+            const result = await g4f.chat.completions.create({
+              model,
+              messages: [{ role: 'user', content: message }],
+            });
+            text = result.choices?.[0]?.message?.content || '';
+            if (text) break;
+          } catch (e) {
+            // Try next model
           }
         }
         if (text) {

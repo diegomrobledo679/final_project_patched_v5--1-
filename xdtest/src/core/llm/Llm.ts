@@ -5,7 +5,8 @@ import { logger } from "../../utils/logger.js";
 import { assert } from "console";
 import { Message, Role, MessageType, ToolCall } from "../types.js";
 import OpenAI from 'openai';
-import { G4F } from 'g4f';
+// @ts-ignore - External package lacks type definitions
+import { Client } from '@gpt4free/g4f.dev';
 import { InterpreterOptions } from "../InterpreterOptions.js";
 
 export class Llm {
@@ -15,7 +16,7 @@ export class Llm {
   private contextWindow: number | null;
   private maxTokens: number | null;
   private openai!: OpenAI;
-  private g4f?: G4F;
+  private g4f?: Client;
   private llmProvider!: string;
   private llmApiKey?: string;
   private llmBaseUrl?: string;
@@ -28,7 +29,7 @@ export class Llm {
   }
 
   public setLlmSettings(options: InterpreterOptions) {
-    this.llmProvider = options.llmProvider || process.env.LLM_PROVIDER || 'g4f';
+    this.llmProvider = options.llmProvider || process.env.LLM_PROVIDER || 'g4f.dev';
     this.model = options.llmModel || process.env.LLM_MODEL || Models.GPT_4O;
     this.llmApiKey =
       options.llmApiKey ||
@@ -38,8 +39,8 @@ export class Llm {
     this.temperature = options.llmTemperature ?? (process.env.LLM_TEMPERATURE ? parseFloat(process.env.LLM_TEMPERATURE) : this.temperature);
     this.maxTokens = options.llmMaxTokens ?? (process.env.LLM_MAX_TOKENS ? parseInt(process.env.LLM_MAX_TOKENS, 10) : this.maxTokens);
 
-    if (this.llmProvider === 'g4f') {
-      this.g4f = new G4F();
+    if (this.llmProvider === 'g4f.dev') {
+      this.g4f = new Client();
     } else if (this.llmProvider === 'ollama') {
       this.llmBaseUrl = this.llmBaseUrl || process.env.OLLAMA_BASE_URL || 'http://localhost:11434/v1';
       if (!this.llmApiKey) {
@@ -53,7 +54,7 @@ export class Llm {
       }
     }
 
-    if (this.llmProvider !== 'g4f') {
+    if (this.llmProvider !== 'g4f.dev') {
       this.openai = new OpenAI({
         apiKey: this.llmApiKey,
         baseURL: this.llmBaseUrl,
@@ -82,9 +83,13 @@ export class Llm {
       ...(msg.tool_calls && { tool_calls: msg.tool_calls }),
     }));
 
-    if (this.llmProvider === 'g4f' && this.g4f) {
+    if (this.llmProvider === 'g4f.dev' && this.g4f) {
       const g4fMessages = preparedMessages.map(m => ({ role: m.role, content: m.content }));
-      const content = await this.g4f.chatCompletion(g4fMessages);
+      const result = await this.g4f.chat.completions.create({
+        model,
+        messages: g4fMessages,
+      });
+      const content = result.choices?.[0]?.message?.content || '';
       return { role: Role.Assistant, messageType: MessageType.Message, content };
     }
 
