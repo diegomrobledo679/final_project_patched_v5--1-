@@ -283,7 +283,9 @@ async function handleSlashCommand(line) {
       return true;
     }
     default:
-      return false;
+      // Inform the user when a slash command is not recognised
+      console.log('Comando no reconocido. Escribe /help para la ayuda.');
+      return true;
   }
 }
 
