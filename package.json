@@ -23,8 +23,7 @@
     "gemini-web": "node gemini-web",
     "cyrah":        "node xdtest/dist/bin/cyrah.js",
     "cyrah-auto":   "node xdtest/dist/bin/cyrah-auto.js",
-    "install-global": "bash install-global.sh",
-    "postinstall": "bash install-global.sh",
+    "postinstall": "npm run build >/dev/null 2>&1 || true",
     "build":  "npm --workspace xdtest run build || echo \"(sin build)\"",
     "test":   "echo \"No tests specified\""
   },
