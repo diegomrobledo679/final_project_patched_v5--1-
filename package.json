@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "g4f": "latest",
-    "dotenv": "latest"
+    "dotenv": "latest",
+    "minimist": "latest",
+    "express": "latest"
   }
 }
