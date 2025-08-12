@@ -70,6 +70,8 @@ abusos (10.000 caracteres). Cambie de modo con `/mode chat` o
 
 Si instala el paquete de forma global (`npm install -g .`), npm creará enlaces ejecutables en la carpeta de binarios globales (consulte `npm bin -g`). Asegúrese de que esa ruta esté en su `PATH`; así podrá invocar `g4f-cli`, `gemini-cli`, `gemini-web`, `g4f-menu`, `cyrah` y `cyrah-auto` desde cualquier directorio.
 
+Para instalarlo de forma global sin pasos adicionales basta con ejecutar `npm install -g .` (o el nombre del paquete publicado). Un script de postinstalación compila los recursos necesarios y registra el paquete globalmente de manera silenciosa. Si se trabaja desde un clon local, también puede usarse `npm run install-global` para lograr el mismo resultado.
+
 Para ejecutar cualquiera de estos comandos sin instalación global utilice `npm run <comando>`, por ejemplo `npm run gemini-web` o `npm run g4f-menu`.
 Si al ejecutar `gemini-cli` en Windows aparece un mensaje "Cannot find module", instale el proyecto con `npm install -g .` y asegúrese de que la carpeta global de npm esté en la variable PATH. Como alternativa, ejecute la herramienta con `node %AppData%\npm\node_modules\g4f-unified-interface\bin\gemini-cli`.
 
