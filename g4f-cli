@@ -21,20 +21,13 @@ const readline = require('readline');
 const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const { G4F } = require('g4f');
+const { Client } = require('@gpt4free/g4f.dev');
 require('dotenv').config();
 const pkg = require('./package.json');
 const VERSION = pkg.version || 'dev';
 
 // Create a single reusable client for all requests
-const g4f = new G4F();
-
-// List of providers to try, separated by "|". By default include all
-// known providers exposed by g4f.
-const PROVIDERS = (process.env.PROVIDERS || Object.keys(g4f.providers).join('|'))
-  .split('|')
-  .map((p) => p.trim())
-  .filter(Boolean);
+const g4f = new Client();
 
 // Maximum length of a user input. Inputs longer than this will be
 // rejected to prevent abuse and resource exhaustion. Adjust as
@@ -85,23 +78,20 @@ let conversation = [];
 async function callG4F(prompt) {
   conversation.push({ role: 'user', content: prompt });
   const modelsToTry = currentModel.split('|').map((m) => m.trim()).filter(Boolean);
-  for (const providerName of PROVIDERS) {
-    const provider = g4f.providers[providerName];
-    if (!provider) continue;
-    for (const model of modelsToTry) {
-      try {
-        const text = await g4f.chatCompletion(conversation, {
-          model,
-          provider,
-        });
-        if (text) {
-          conversation.push({ role: 'assistant', content: text });
-          currentModel = model;
-          return text;
-        }
-      } catch (e) {
-        // Try next provider/model combination
+  for (const model of modelsToTry) {
+    try {
+      const result = await g4f.chat.completions.create({
+        model,
+        messages: conversation,
+      });
+      const text = result.choices?.[0]?.message?.content || '';
+      if (text) {
+        conversation.push({ role: 'assistant', content: text });
+        currentModel = model;
+        return text;
       }
+    } catch (e) {
+      // Try next model on error
     }
   }
   return '';

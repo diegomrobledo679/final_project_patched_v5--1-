@@ -7,8 +7,8 @@ describe('Llm', () => {
     expect(interpreter.llm).toBeInstanceOf(Llm);
   });
 
-  it('initializes with g4f provider without API key', () => {
-    const interpreter = new Interpreter({ llmProvider: 'g4f' });
+  it('initializes with g4f.dev provider without API key', () => {
+    const interpreter = new Interpreter({ llmProvider: 'g4f.dev' });
     expect(interpreter.llm).toBeInstanceOf(Llm);
   });
 

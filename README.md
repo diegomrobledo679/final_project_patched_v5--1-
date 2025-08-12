@@ -4,8 +4,8 @@ Este proyecto proporciona una versión unificada de tres mecanismos
 originalmente separados: una interfaz de línea de comandos (CLI), un
 intérprete de comandos y una interfaz web. Se eliminan las
 dependencias y referencias a la herramienta **Gemini**, centrándose en
-el uso de **g4f** como motor de IA. Internamente se emplea la librería
-`g4f` de npm para realizar directamente las peticiones al modelo.
+el uso de **@gpt4free/g4f.dev** como motor de IA. Internamente se emplea la librería
+`@gpt4free/g4f.dev` de npm para realizar directamente las peticiones al modelo.
 Además, se añaden límites de
 entrada y comandos adicionales para un uso más profesional.
 
@@ -14,7 +14,7 @@ entrada y comandos adicionales para un uso más profesional.
 * `webui/` – Servidor HTTP y archivos estáticos que ofrecen una
   interfaz gráfica en el navegador. Permite cambiar entre vista de
   consola, chat y modo intérprete. Utiliza por defecto la API pública
-  de **g4f** para generar respuestas. Ejecuta `node webui/server.js` y abre
+  de **@gpt4free/g4f.dev** para generar respuestas. Ejecuta `node webui/server.js` y abre
   `http://localhost:3000` en el navegador.
 
 * `g4f-cli` – Script de Node.js que unifica la interacción por
@@ -50,7 +50,7 @@ entrada y comandos adicionales para un uso más profesional.
 
 ### Web UI
 
-1. Instale las dependencias (incluida `g4f`) con `npm install`.
+1. Instale las dependencias (incluida `@gpt4free/g4f.dev`) con `npm install`.
 2. Inicie el servidor ejecutando `./gemini-web` (o
    alternativamente `node webui/server.js`). Puede usar también
    `npm run web` para el mismo resultado.
@@ -76,7 +76,7 @@ Para ejecutar cualquiera de estos comandos sin instalación global utilice `npm 
 Si al ejecutar `gemini-cli` en Windows aparece un mensaje "Cannot find module", instale el proyecto con `npm install -g .` y asegúrese de que la carpeta global de npm esté en la variable PATH. Como alternativa, ejecute la herramienta con `node %AppData%\npm\node_modules\g4f-unified-interface\bin\gemini-cli`.
 
 Si no se especifica otro valor, el proveedor por defecto para las
-peticiones de IA es **g4f**, que selecciona automáticamente un backend
+peticiones de IA es **@gpt4free/g4f.dev**, que selecciona automáticamente un backend
 disponible.
 
 ### Menú interactivo
@@ -91,7 +91,7 @@ directorio.
 Aunque el directorio `gemini-cli` permanece en el repositorio, el
 código de la herramienta Gemini no se utiliza ni se hace referencia
 en la interfaz web ni en la CLI. Toda la interacción se realiza a
-través de **g4f**. Para limpiar por completo esta referencia, puede
+través de **@gpt4free/g4f.dev**. Para limpiar por completo esta referencia, puede
 eliminar la carpeta `gemini-cli` si lo desea.
 
 ## Límites y medidas de seguridad
