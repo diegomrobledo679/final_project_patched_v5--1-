@@ -1,7 +1,8 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { Client } = require('@gpt4free/g4f.dev');
+const g4fPkg = require('@gpt4free/g4f.dev');
+const { Client } = g4fPkg;
 require('dotenv').config();
 
 // Reusable g4f client

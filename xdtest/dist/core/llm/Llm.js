@@ -13,7 +13,9 @@ import { assert } from "console";
 import { Role, MessageType } from "../types.js";
 import OpenAI from 'openai';
 // @ts-ignore - External package lacks type definitions
-import { Client } from '@gpt4free/g4f.dev';
+import pkg from '@gpt4free/g4f.dev';
+// @ts-ignore - Extract Client from default export
+const { Client } = pkg;
 export class Llm {
     constructor(interpreter, options) {
         this.temperature = 0;

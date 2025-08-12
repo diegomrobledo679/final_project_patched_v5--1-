@@ -6,7 +6,9 @@ import { assert } from "console";
 import { Message, Role, MessageType, ToolCall } from "../types.js";
 import OpenAI from 'openai';
 // @ts-ignore - External package lacks type definitions
-import { Client } from '@gpt4free/g4f.dev';
+import pkg from '@gpt4free/g4f.dev';
+// @ts-ignore - Extract Client from default export
+const { Client } = pkg as any;
 import { InterpreterOptions } from "../InterpreterOptions.js";
 
 export class Llm {
@@ -16,7 +18,7 @@ export class Llm {
   private contextWindow: number | null;
   private maxTokens: number | null;
   private openai!: OpenAI;
-  private g4f?: Client;
+  private g4f?: any;
   private llmProvider!: string;
   private llmApiKey?: string;
   private llmBaseUrl?: string;
