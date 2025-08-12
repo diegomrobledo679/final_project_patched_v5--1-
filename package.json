@@ -27,18 +27,6 @@
     "build":  "npm --workspace xdtest run build || echo \"(sin build)\"",
     "test":   "echo \"No tests specified\""
   },
-  "workspaces": ["xdtest"],
-  "keywords": ["g4f", "cli", "web"],
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tu‑usuario/g4f-unified-interface.git"
-  },
-  "author": "Juan Ignacio Robledo <ignarobledo1@gmail.com>",
-  "bugs": {
-    "url": "https://github.com/diegomrobledo679/final_project_patched_v5--1-/issues"
-  },
-  "homepage": "https://github.com/diegomrobledo679/final_project_patched_v5--1-/#readme",
   "dependencies": {
     "@types/sql.js": "^1.4.9",
     "ajv": "^8.12.0",
@@ -82,8 +70,5 @@
     "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
-  },
-  "engines": {
-    "node": ">=18"
   }
 }
