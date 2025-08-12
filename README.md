@@ -43,6 +43,11 @@ entrada y comandos adicionales para un uso más profesional.
 
 ## Uso
 
+> **Nota:** Para ejecutar los scripts definidos en `package.json` utilice
+> siempre `npm run <script>`. Ejecutar `npm <script>` sin la palabra
+> `run` provocará el mensaje de error `npm ERR! could not determine
+> executable to run`.
+
 ### Web UI
 
 1. Instale las dependencias (incluida `g4f`) con `npm install`.
