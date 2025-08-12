@@ -16,8 +16,8 @@ const path = require('path');
 const NODE_PATH = process.execPath;
 
 const options = [
-  { label: 'Abrir CLI', script: 'g4f-cli.js' },
-  { label: 'Abrir interfaz web', script: 'gemini-web.js' },
+  { label: 'Abrir CLI', script: 'g4f-cli' },
+  { label: 'Abrir interfaz web', script: 'gemini-web' },
   { label: 'Ejecutar Cyrah', script: path.join('xdtest', 'dist', 'bin', 'cyrah.js') },
   { label: 'Salir', script: null }
 ];
