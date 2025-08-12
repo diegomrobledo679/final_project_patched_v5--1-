@@ -9,6 +9,12 @@ const readline = require('readline');
 const { spawn } = require('child_process');
 const path = require('path');
 
+// Use the current Node.js executable to avoid relying on `node`
+// being present in the PATH. This improves compatibility across
+// environments where the command might not be directly accessible
+// (e.g. installations via nvm or custom setups).
+const NODE_PATH = process.execPath;
+
 const options = [
   { label: 'Abrir CLI', script: 'g4f-cli.js' },
   { label: 'Abrir interfaz web', script: 'gemini-web.js' },
@@ -43,8 +49,18 @@ function runOption(index) {
   }
   rl.pause();
   const scriptPath = path.join(__dirname, opt.script);
-  const child = spawn('node', [scriptPath], { stdio: 'inherit' });
+  const child = spawn(NODE_PATH, [scriptPath], { stdio: 'inherit' });
+
+  // When the spawned process finishes, resume the menu.
   child.on('exit', () => {
+    rl.resume();
+    showMenu();
+  });
+
+  // If the child process could not be executed, inform the user and
+  // return to the menu instead of crashing.
+  child.on('error', (err) => {
+    console.error(`No se pudo ejecutar ${scriptPath}:`, err.message);
     rl.resume();
     showMenu();
   });
