@@ -19,10 +19,7 @@
     "g4f-menu":   "g4f-menu.js",
     "gemini-web": "gemini-web.js",
     "cyrah":        "xdtest/dist/bin/cyrah.js",
-    "cyrah-auto":   "xdtest/dist/bin/cyrah-auto.js",
-    "postinstall": "npm run build >/dev/null 2>&1 || true",
-    "build":  "npm --workspace xdtest run build || echo \"(sin build)\"",
-    "test":   "echo \"No tests specified\""
+    "cyrah-auto":   "xdtest/dist/bin/cyrah-auto.js"
   },
   "dependencies": {
     "g4f": "latest",
