@@ -27,4 +27,5 @@
   "dependencies": {
     "g4f": "latest",
     "dotenv": "latest"
+  }
 }
