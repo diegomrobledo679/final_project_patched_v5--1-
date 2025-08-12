@@ -17,24 +17,24 @@ entrada y comandos adicionales para un uso más profesional.
   de **g4f** para generar respuestas. Ejecuta `node webui/server.js` y abre
   `http://localhost:3000` en el navegador.
 
-* `g4f-cli.js` – Script de Node.js que unifica la interacción por
+* `g4f-cli` – Script de Node.js que unifica la interacción por
   consola. Ofrece tres modos (`cli`, `chat` e `interpreter`),
   comandos barra (`/help`, `/mode`, `/stats`, etc.), historial de
   comandos y ejecución de órdenes de shell con un directorio de
   trabajo persistente. Para iniciarlo, ejecute:
 
   ```sh
-  node g4f-cli.js
+  ./g4f-cli
   ```
 
-* `gemini-cli.js` – Alias que inicia la CLI unificada. Permite
-  ejecutar el modo consola escribiendo simplemente `node
-  gemini-cli.js`.
+* `gemini-cli` – Alias que inicia la CLI unificada. Permite
+  ejecutar el modo consola escribiendo simplemente `gemini-cli` (si
+  el paquete se instaló globalmente).
 
-* `gemini-web.js` – Alias que inicia el servidor web. Arranca el
-  servidor de la carpeta `webui` al ejecutar `node gemini-web.js`.
+* `gemini-web` – Alias que inicia el servidor web. Arranca el
+  servidor de la carpeta `webui` al ejecutar `./gemini-web`.
 
-* `g4f-menu.js` – Presenta un pequeño menú en la terminal para
+* `g4f-menu` – Presenta un pequeño menú en la terminal para
   escoger entre iniciar la CLI, la interfaz web o las utilidades de
   `xdtest`.
 
@@ -51,7 +51,7 @@ entrada y comandos adicionales para un uso más profesional.
 ### Web UI
 
 1. Instale las dependencias (incluida `g4f`) con `npm install`.
-2. Inicie el servidor ejecutando `node gemini-web.js` (o
+2. Inicie el servidor ejecutando `./gemini-web` (o
    alternativamente `node webui/server.js`). Puede usar también
    `npm run web` para el mismo resultado.
 3. Abra su navegador en `http://localhost:3000`. Podrá enviar
@@ -61,13 +61,15 @@ entrada y comandos adicionales para un uso más profesional.
 
 ### CLI
 
-Ejecute `node gemini-cli.js` (o `node g4f-cli.js`) en la raíz del proyecto. Por defecto comenzará en modo `cli`. Escriba `/help` para ver los comandos
+Ejecute `./g4f-cli` en la raíz del proyecto. Si instaló el paquete de
+forma global, también puede usar el alias `gemini-cli`. Por defecto
+comenzará en modo `cli`. Escriba `/help` para ver los comandos
 disponibles. El tamaño máximo de entrada está limitado para evitar
 abusos (10.000 caracteres). Cambie de modo con `/mode chat` o
 `/mode interpreter`.
 
 Si instala el paquete de forma global (`npm install -g .`), npm creará enlaces ejecutables en la carpeta de binarios globales (consulte `npm bin -g`). Asegúrese de que esa ruta esté en su `PATH`; así podrá invocar `g4f-cli`, `gemini-web` o `g4f-menu` desde cualquier directorio.
-Si al ejecutar `gemini-cli` en Windows aparece un mensaje "Cannot find module", instale el proyecto con `npm install -g .` y asegurese de que la carpeta global de npm este en la variable PATH. Como alternativa, ejecute la herramienta con `node %AppData%\npm\node_modules\g4f-unified-interface\gemini-cli.js`.
+Si al ejecutar `gemini-cli` en Windows aparece un mensaje "Cannot find module", instale el proyecto con `npm install -g .` y asegúrese de que la carpeta global de npm esté en la variable PATH. Como alternativa, ejecute la herramienta con `node %AppData%\npm\node_modules\g4f-unified-interface\bin\gemini-cli`.
 
 Si no se especifica otro valor, el proveedor por defecto para las
 peticiones de IA es **g4f**, que selecciona automáticamente un backend
@@ -75,7 +77,7 @@ disponible.
 
 ### Menú interactivo
 
-Ejecute `node g4f-menu.js` para mostrar un menú que permite lanzar la
+Ejecute `./g4f-menu` para mostrar un menú que permite lanzar la
 CLI, la interfaz web o la utilidad `cyrah`. Si instala el paquete de
 forma global, podrá invocar simplemente `g4f-menu` desde cualquier
 directorio.
@@ -135,7 +137,7 @@ sesión, por lo que el modelo dispone de contexto completo.
 Las aportaciones son bienvenidas. Por favor, asegúrese de no
 introducir dependencias de Gemini ni violar las restricciones
 mencionadas arriba. Para ampliar las capacidades de IA, se puede
-modificar la función `callG4F` en `g4f-cli.js` o el manejador
+modificar la función `callG4F` en `g4f-cli` o el manejador
 correspondiente en `webui/public/index.html`.
 
 ## Cyrah (xdtest)
