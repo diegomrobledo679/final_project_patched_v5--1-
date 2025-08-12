@@ -1,5 +1,6 @@
 {
   "name": "g4f-unified-interface",
+  "version": "0.0.1",
   "bin": {
     "g4f-cli":    "g4f-cli.js",
     "gemini-cli": "bin/gemini-cli.js",
@@ -21,6 +22,17 @@
     "cyrah":        "xdtest/dist/bin/cyrah.js",
     "cyrah-auto":   "xdtest/dist/bin/cyrah-auto.js"
   },
+  "keywords": ["g4f", "cli", "web"],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu‑usuario/g4f-unified-interface.git"
+  },
+  "author": "Juan Ignacio Robledo <ignarobledo1@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/diegomrobledo679/final_project_patched_v5--1-/issues"
+  },
+  "homepage": "https://github.com/diegomrobledo679/final_project_patched_v5--1-/#readme",
   "dependencies": {
     "@types/sql.js": "^1.4.9",
     "ajv": "^8.12.0",
